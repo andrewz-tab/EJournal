@@ -1,0 +1,56 @@
+﻿@model IEnumerable<EJournal.Models.Employee>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Upsert">Добавить сотрудника</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Account.PersonalData.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Account.EMail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Account.PhoneNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Roles)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Account.PersonalData.FullName)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Account.EMail)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Account.PhoneNumber)
+            </td>
+            <td>
+                @foreach(var role in item.Roles)
+                {
+                        <p>role.Name</p>
+                }
+            </td>
+            <td>
+                    <a asp-action="Upsert" asp-route-id="@item.Id">Изменить</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Подробнее</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+            </td>
+        </tr>  
+        }
+    </tbody>
+</table>
