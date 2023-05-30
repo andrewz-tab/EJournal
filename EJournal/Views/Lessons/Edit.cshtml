@@ -1,0 +1,111 @@
+﻿@model EJournal.Models.ViewModels.LessonViewModel.DetailsLessonViewModel
+
+@{
+    ViewData["Title"] = "Занятие по предмету \"" + Model.SubjectName + "\"";
+}
+
+<h1>@ViewData["Title"]</h1>
+@if (ViewData["MarkNotValid"] != null)
+{
+    <span class="text-danger">Оцена может быть следующей: "5", "4", "3", "2", "1" ,"Н", " "</span>
+}
+<p>
+    <a asp-action="Details" asp-route-id="Id">Прекратить редактирование без сохранения</a>
+</p>
+<div class="row">
+    <div class="col-md-4">
+        <input asp-for="Id" hidden />
+        <input asp-for="DisciplineId" hidden />
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SubjectName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SubjectName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClassName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClassName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EmployeeName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.EmployeeName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.date)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.date)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.index)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.index)
+        </dd>
+    </div>
+</div>
+
+
+<form method="post" asp-action="Edit">
+            <input asp-for="Id" hidden />
+    <input asp-for="studentIDDecription" hidden />
+    <input asp-for="studentIDMark" hidden />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="HomeWork" class="control-label"></label>
+                <input asp-for="HomeWork" class="form-control" />
+                <span asp-validation-for="HomeWork" class="text-danger"></span>
+            </div>
+    <hr />
+<h4>Оценки</h4>
+
+    <table class="table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    Ученики
+                </th>
+                <th>
+                    Оценки
+                </th>
+                <th>
+                    Примечание
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model.studentIDName)
+            {
+                <tr>
+                    <td>
+                        <a asp-controller="Students" asp-action="Details" asp-route-id="@student.Key">
+                            @student.Value
+                        </a>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <select asp-for="@Model.studentIDMark[student.Key]" class="form-control" asp-items="@Model.marks">
+                            </select>
+                            <span asp-validation-for="@Model.studentIDMark[student.Key]" class="text-danger"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input asp-for="@Model.studentIDDecription[student.Key]" class="form-control" />
+                            <span asp-validation-for="@Model.studentIDDecription[student.Key]" class="text-danger"></span>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+    <div class="form-group">
+            <input type="submit" value="Обновить" class="btn btn-primary" />
+    </div>
+</form>

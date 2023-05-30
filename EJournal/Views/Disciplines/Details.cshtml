@@ -1,0 +1,148 @@
+﻿@model EJournal.Models.ViewModels.DisciplineViewModels.DetailsDisciplineViewModel
+
+@{
+    ViewData["Title"] = "Данные о дисциплины";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+
+<div>
+    <a asp-action="Index">Вернуться к списку</a> <a asp-action="Upsert" asp-route-id="@Model.Id">Обновить даныне</a>
+</div>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        
+            <input asp-for="Id" hidden />
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SubjectName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SubjectName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClassName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClassName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EmployeeName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.EmployeeName)
+        </dd>
+
+
+    </div>
+</div>
+<style type="text/css">
+
+    body {
+        position: relative;
+    }
+
+    .scrollable
+    {
+        overflow-x: scroll;
+        overflow-y: visible;
+    }
+
+
+</style>
+
+<script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+<hr />
+<h4>Оценки</h4>
+
+@if (Model.studentMarks == null || Model.lessons == null)
+{
+    <dt class="col-sm-2">
+        Оценки отсутсвуют
+    </dt>
+
+}
+else
+{
+    <div class="scrollable">
+        <table class="table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        Ученики
+                    </th>
+                    <th>
+                        Сред. оценка
+                    </th>
+                    @foreach (var date in Model.lessons)
+                    {
+                        <th>
+                            <a asp-controller="Lessons" asp-action="Details" asp-route-id="@date.Value">
+                                @date.Text
+                            </a>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var student in Model.studentMarks)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Students" asp-action="Details" asp-route-id="@student.Key.Value">
+                                @student.Key.Text
+                            </a>
+                        </td>
+                        <td>
+                            @{
+                                double sred = 0; int count = 0;
+                                foreach (var mark in student.Value)
+                                {
+                                    @if (mark > 0 && mark <= 5)
+                                    {
+                                        sred += mark;
+                                        count++;
+                                    }
+                                }
+                                @if (count > 0)
+                                {
+                                    @(sred / count)
+                                }
+                            }
+                        </td>
+
+                        @foreach (var mark in student.Value)
+                        {
+                            <td>
+
+                                @if (mark == -1)
+                                {
+                                    @("Н")
+                                }
+                                else if (mark > 0 && mark <= 5)
+                                {
+                                    @(mark)
+                                }
+                                else
+                                {
+                                    @("_")
+                                }
+                            </td>
+                        }
+
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+
+
+
+}
+

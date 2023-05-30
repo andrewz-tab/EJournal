@@ -1,0 +1,36 @@
+﻿@model IEnumerable<EJournal.Models.Discipline>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Класс
+            </th>
+            <th>
+                Учитель
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Class.Number)
+                    @Html.DisplayFor(modelItem => item.Class.Liter)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.Account.PersonalData.FullName)
+                </td>
+                <td>
+                    <a asp-controller="Disciplines" asp-action="Upsert" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-controller="Disciplines" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-controller="Disciplines" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

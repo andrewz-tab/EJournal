@@ -1,4 +1,6 @@
 using EJournal.Data;
+using EJournal.Repository;
+using EJournal.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace EJournal
@@ -17,7 +19,15 @@ namespace EJournal
                 options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
                     new MySqlServerVersion(new Version(8, 0, 31)));
             });
-
+            builder.Services.AddRazorPages()
+                .AddRazorRuntimeCompilation();
+            builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            builder.Services.AddScoped<IClassRepository, ClassRepository>();
+            builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+            builder.Services.AddScoped<IDisciplineRepository, DisciplineRepository>();
+            builder.Services.AddScoped<ITimetableRepository, TimetableRepository>();
+            builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+            builder.Services.AddScoped<ILessonRepository, LessonRepository>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -1,0 +1,37 @@
+﻿@model EJournal.Models.Subject
+@{
+    ViewData["Title"] = "Данные о предмете";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h4>Предмет @Model.Name</h4>
+<div>
+    <a asp-action="Index">Вернуться к списку</a> <a asp-action="Upsert" asp-route-id="@Model.Id">Обновить даныне</a>
+</div>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+
+        <input asp-for="Id" hidden />
+
+        <hr />
+        <h4>Дисциплины</h4>
+        <a asp-controller="Disciplines" asp-action="Upsert">Добавить дисциплину</a>
+        @if (Model.Disciplines.Count() != 0)
+        {
+            await Html.RenderPartialAsync("SubjectsDiscipline", Model.Disciplines);
+        }
+        else
+        {
+            <dt class="col-sm-2">
+                Дисциплины отсутсвуют
+            </dt>
+        }
+
+
+
+    </div>
+</div>
+

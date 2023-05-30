@@ -7,7 +7,7 @@ namespace EJournal.Data
     {
         public JournalDbContext(DbContextOptions<JournalDbContext> options) : base(options) 
         {
-
+            Database.EnsureCreated();
         }
         public DbSet<Account> Accounts { get; set; } = null!;
         public DbSet<Class> Classes { get; set; } = null!;
@@ -19,17 +19,18 @@ namespace EJournal.Data
         public DbSet<Role> Roles { get; set; } = null!;
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<TypeUser> TypeUsers { get; set; } = null!;
+        public DbSet<Subject> Subjects { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Account>().HasAlternateKey(a => a.EMail);
-            modelBuilder.Entity<Class>().HasAlternateKey(c => new { c.Number, c.Liter });
-            modelBuilder.Entity<Discipline>().HasAlternateKey(d => new { d.SubjectKey, d.EmployeeKey, d.ClassKey });
-            modelBuilder.Entity<Mark>().ToTable(m => m.HasCheckConstraint("Value", "Value >= 0 AND Value <= 5"));
-            modelBuilder.Entity<PersonalData>().HasAlternateKey(pd => pd.SNILS);
-            modelBuilder.Entity<Role>().HasAlternateKey(r => r.Name);
-            modelBuilder.Entity<Subject>().HasAlternateKey(s => s.Name);
-            modelBuilder.Entity<TypeUser>().HasAlternateKey(tu => tu.Name);
+            modelBuilder.Entity<Account>().HasIndex(a => a.EMail).IsUnique();
+            modelBuilder.Entity<Class>().HasIndex(c => new { c.Number, c.Liter }).IsUnique();
+            modelBuilder.Entity<Discipline>().HasIndex(d => new { d.SubjectKey, d.EmployeeKey, d.ClassKey }).IsUnique();
+            modelBuilder.Entity<Mark>().ToTable(m => m.HasCheckConstraint("Value", "Value >= -1 AND Value <= 5"));
+            modelBuilder.Entity<PersonalData>().HasIndex(pd => pd.SNILS).IsUnique();
+            modelBuilder.Entity<Role>().HasIndex(r => r.Name).IsUnique();
+            modelBuilder.Entity<Subject>().HasIndex(s => s.Name).IsUnique();
+            modelBuilder.Entity<TypeUser>().HasIndex(tu => tu.Name).IsUnique();
 
 
             modelBuilder.Entity<Account>()
@@ -40,7 +41,7 @@ namespace EJournal.Data
             modelBuilder.Entity<Class>()
                 .HasOne(c => c.Employee)
                 .WithMany(e => e.Classes)
-                .HasForeignKey(c => c.EmployeeKey);
+                .HasForeignKey(c => c.EmployeeKey).OnDelete(DeleteBehavior.SetNull);
 
 
             modelBuilder.Entity<Discipline>()
@@ -59,7 +60,7 @@ namespace EJournal.Data
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.Account)
                 .WithOne(a => a.Employee)
-                .HasForeignKey<Employee>(e => e.AccountKey);
+                .HasForeignKey<Employee>(e => e.AccountKey).OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Lesson>()
                 .HasOne(l => l.Discipline)
@@ -78,7 +79,7 @@ namespace EJournal.Data
             modelBuilder.Entity<PersonalData>()
                 .HasOne(pd => pd.Account)
                 .WithOne(a => a.PersonalData)
-                .HasForeignKey<PersonalData>(pd => pd.AccountKey);
+                .HasForeignKey<PersonalData>(pd => pd.AccountKey).OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Role>()
                 .HasMany(r => r.Employees)
@@ -92,7 +93,7 @@ namespace EJournal.Data
             modelBuilder.Entity<Student>()
                 .HasOne(s => s.Account)
                 .WithOne(a => a.Student)
-                .HasForeignKey<Student>(s => s.AccountKey);
+                .HasForeignKey<Student>(s => s.AccountKey).OnDelete(DeleteBehavior.Cascade);
 
 
             modelBuilder.Entity<Role>().HasData(

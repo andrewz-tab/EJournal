@@ -29,12 +29,11 @@ namespace EJournal.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
-                    table.UniqueConstraint("AK_Roles_Name", x => x.Name);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Subject",
+                name: "Subjects",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -44,8 +43,7 @@ namespace EJournal.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subject", x => x.Id);
-                    table.UniqueConstraint("AK_Subject_Name", x => x.Name);
+                    table.PrimaryKey("PK_Subjects", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -61,7 +59,6 @@ namespace EJournal.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TypeUsers", x => x.Id);
-                    table.UniqueConstraint("AK_TypeUsers_Name", x => x.Name);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -81,7 +78,6 @@ namespace EJournal.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Accounts", x => x.Id);
-                    table.UniqueConstraint("AK_Accounts_EMail", x => x.EMail);
                     table.ForeignKey(
                         name: "FK_Accounts_TypeUsers_TypeUserKey",
                         column: x => x.TypeUserKey,
@@ -132,7 +128,6 @@ namespace EJournal.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PersonalDatas", x => x.Id);
-                    table.UniqueConstraint("AK_PersonalDatas_SNILS", x => x.SNILS);
                     table.ForeignKey(
                         name: "FK_PersonalDatas_Accounts_AccountKey",
                         column: x => x.AccountKey,
@@ -151,18 +146,16 @@ namespace EJournal.Migrations
                     Number = table.Column<int>(type: "int", nullable: false),
                     Liter = table.Column<string>(type: "varchar(1)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    EmployeeKey = table.Column<int>(type: "int", nullable: false)
+                    EmployeeKey = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Classes", x => x.Id);
-                    table.UniqueConstraint("AK_Classes_Number_Liter", x => new { x.Number, x.Liter });
                     table.ForeignKey(
                         name: "FK_Classes_Employees_EmployeeKey",
                         column: x => x.EmployeeKey,
                         principalTable: "Employees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -204,7 +197,6 @@ namespace EJournal.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Disciplines", x => x.Id);
-                    table.UniqueConstraint("AK_Disciplines_SubjectKey_EmployeeKey_ClassKey", x => new { x.SubjectKey, x.EmployeeKey, x.ClassKey });
                     table.ForeignKey(
                         name: "FK_Disciplines_Classes_ClassKey",
                         column: x => x.ClassKey,
@@ -218,9 +210,9 @@ namespace EJournal.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Disciplines_Subject_SubjectKey",
+                        name: "FK_Disciplines_Subjects_SubjectKey",
                         column: x => x.SubjectKey,
-                        principalTable: "Subject",
+                        principalTable: "Subjects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -330,6 +322,12 @@ namespace EJournal.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Accounts_EMail",
+                table: "Accounts",
+                column: "EMail",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Accounts_TypeUserKey",
                 table: "Accounts",
                 column: "TypeUserKey");
@@ -340,6 +338,12 @@ namespace EJournal.Migrations
                 column: "EmployeeKey");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Classes_Number_Liter",
+                table: "Classes",
+                columns: new[] { "Number", "Liter" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Disciplines_ClassKey",
                 table: "Disciplines",
                 column: "ClassKey");
@@ -348,6 +352,12 @@ namespace EJournal.Migrations
                 name: "IX_Disciplines_EmployeeKey",
                 table: "Disciplines",
                 column: "EmployeeKey");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Disciplines_SubjectKey_EmployeeKey_ClassKey",
+                table: "Disciplines",
+                columns: new[] { "SubjectKey", "EmployeeKey", "ClassKey" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeRole_RolesId",
@@ -382,6 +392,18 @@ namespace EJournal.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_PersonalDatas_SNILS",
+                table: "PersonalDatas",
+                column: "SNILS",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Roles_Name",
+                table: "Roles",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Students_AccountKey",
                 table: "Students",
                 column: "AccountKey",
@@ -391,6 +413,18 @@ namespace EJournal.Migrations
                 name: "IX_Students_ClassKey",
                 table: "Students",
                 column: "ClassKey");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subjects_Name",
+                table: "Subjects",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TypeUsers_Name",
+                table: "TypeUsers",
+                column: "Name",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -421,7 +455,7 @@ namespace EJournal.Migrations
                 name: "Classes");
 
             migrationBuilder.DropTable(
-                name: "Subject");
+                name: "Subjects");
 
             migrationBuilder.DropTable(
                 name: "Employees");

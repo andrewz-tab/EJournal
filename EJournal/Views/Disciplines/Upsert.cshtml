@@ -1,0 +1,99 @@
+﻿@model EJournal.Models.ViewModels.DisciplineViewModels.UpsertDisciplineViewModel
+
+@{
+    ViewData["Title"] = "Обновить данные дисциплины";
+    @if (Model.Id == 0)
+    {
+        ViewData["Title"] = "Добавление дисциплины";
+    }
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-action="Upsert">
+            <input asp-for="Id" hidden />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            @if (ViewData["DisciplineDuplicate"] != null)
+            {
+                <span class ="text-danger">Такая дисциплина уже существует</span>
+            }
+
+            <div class="form-group">
+                <label asp-for="SubjectKey" class="control-label"></label>
+                <select asp-for="SubjectKey" class="form-control" asp-items="Model.SubjectDropDown">
+                    @if (Model.Id == 0)
+                    {
+                        <option disabled selected>--Выберите предмет--</option>
+                    }
+                </select>
+                <span asp-validation-for="SubjectKey" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeeKey" class="control-label"></label>
+                <select asp-for="EmployeeKey" class="form-control" asp-items="Model.EmployeeDropDown">
+                    @if (Model.Id == 0)
+                    {
+                        <option disabled selected>--Выберите учителя--</option>
+                    }
+                </select>
+                <span asp-validation-for="EmployeeKey" class="text-danger"></span>
+            </div>
+            @if(Model.Id == 0)
+            {
+                <div class="form-group">
+                    <label asp-for="ClassesIds" class="control-label">Полномочия</label>
+                    <select asp-for="ClassesIds" class="form-control" asp-items="Model.ClassMultpleSelectList" multiple>
+                        @if (Model.Id == 0)
+                        {
+                            <option disabled selected>--Выберите классы--</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ClassesIds" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <label asp-for="ClassKey" class="control-label"></label>
+                    <select asp-for="ClassKey" class="form-control" asp-items="Model.ClassDropDown">
+                        @if (Model.Id == 0)
+                        {
+                            <option disabled selected>--Выберите класс--</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ClassKey" class="text-danger"></span>
+                </div>
+            }
+
+
+            <div class="form-group">
+
+                @if (Model.Id == 0)
+                {
+                    <input type="submit" value="Создать" class="btn btn-primary" />
+                }
+                else
+                {
+
+                    <input type="submit" value="Обновить" class="btn btn-primary" />
+                }
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Вернуться к списку</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

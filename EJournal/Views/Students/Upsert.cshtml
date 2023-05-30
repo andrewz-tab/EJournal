@@ -1,0 +1,131 @@
+﻿@model EJournal.Models.ViewModels.StudentViewModels.UpsertStudentViewModel
+
+@{
+    ViewData["Title"] = "Обновить данные ученика";
+    @if (Model.Id == 0)
+    {
+        ViewData["Title"] = "Добавление ученика";
+    }
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h4>Class</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-action="Upsert">
+            <input asp-for="Id" hidden />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FullName" class="control-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateBirth" class="control-label"></label>
+                <input asp-for="DateBirth" class="form-control" />
+                <span asp-validation-for="DateBirth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                @if(Model.gender == PersonalData.Gender.Women)
+                {
+                    <label asp-for="gender" class="control-label">
+                        <input asp-for="gender" id="0" name="gender" type="radio" value="0" />
+                        <span> Мужской </span>
+                        <input asp-for="gender" id="1" name="gender" type="radio" value="1" checked />
+                        <span> Женский </span>
+                        <span asp-validation-for="gender" class="text-danger"></span>
+                    </label>
+                }
+                else
+                {
+                    <label asp-for="gender" class="control-label">
+                        <input asp-for="gender" id="0" name="gender" type="radio" value="0" checked />
+                        <span> Мужской </span>
+                        <input asp-for="gender" id="1" name="gender" type="radio" value="1"  />
+                        <span> Женский </span>
+                        <span asp-validation-for="gender" class="text-danger"></span>
+                    </label>
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="PassId" class="control-label"></label>
+                <input asp-for="PassId" class="form-control" />
+                <span asp-validation-for="PassId" class="text-danger"></span>
+                @if (ViewData["PassDuplicate"] != null)
+                {
+                    <span class="text-danger">Данные серия и номер паспорта уже использутся</span>
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="SNILS" class="control-label"></label>
+                <input asp-for="SNILS" class="form-control" />
+                <span asp-validation-for="SNILS" class="text-danger"></span>
+                @if (ViewData["SNILSDuplicate"] != null)
+                {
+                    <span class ="text-danger">Данный снилс уже использутся</span>
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="EMail" class="control-label"></label>
+                <input asp-for="EMail" class="form-control" />
+                <span asp-validation-for="EMail" class="text-danger"></span>
+                @if (ViewData["EmailDuplicate"] != null)
+                {
+                    <span class="text-danger">Данный почтовый адресс уже использутся</span>
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                @if (ViewData["PhoneDuplicate"] != null)
+                {
+                    <span class="text-danger">Данный номер телефона уже использутся</span>
+                }
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClassKey" class="control-label"></label>
+                <select asp-for="ClassKey" class="form-control" asp-items="Model.ClassList">
+                    @if (Model.Id == 0)
+                    {
+                        <option disabled selected>--Выберите класс--</option>
+                    }
+                </select>
+                <span asp-validation-for="ClassKey" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+
+                @if (Model.Id == 0)
+                {
+                    <input type="submit" value="Создать" class="btn btn-primary" />
+                }
+                else
+                {
+
+                    <input type="submit" value="Обновить" class="btn btn-primary" />
+                }
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Вернуться к списку</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

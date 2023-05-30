@@ -1,0 +1,160 @@
+﻿@using Microsoft.AspNetCore.Html;
+@model EJournal.Models.ViewModels.StudentViewModels.DetailsStudentViewModel
+
+@{
+    ViewData["Title"] = "Данные об ученике ";
+    @if (Model.gender == PersonalData.Gender.Women)
+    {
+        ViewData["gender"] = "Женский";
+    }
+    else
+    {
+        ViewData["gender"] = "Мужской";
+    }
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <a asp-action="Index">Вернуться к списку</a> <a asp-action="Upsert" asp-route-id="@Model.Id">Обновить даныне</a>
+</div>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <input asp-for="ClassKey" hidden />
+        <input asp-for="Id" hidden />
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FullName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FullName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DateBirth)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DateBirth)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.gender)
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["gender"] <br />
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PassId)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.PassId == null)
+            {
+                <span>Данные отсутсвуют</span>                
+            }
+            @Html.DisplayFor(model => model.PassId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SNILS)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SNILS)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EMail)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.EMail == null)
+            {
+                <span>Данные отсутсвуют</span>
+            }
+            @Html.DisplayFor(model => model.EMail)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.PhoneNumber == null)
+            {
+                <span>Данные отсутсвуют</span>
+            }
+            @Html.DisplayFor(model => model.PhoneNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Description == null)
+            {
+                <span>Данные отсутсвуют</span>
+            }
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClassName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClassName)
+        </dd>
+        
+    </div>
+</div>
+
+    <hr />
+    <h4>Дисциплины</h4>
+<a asp-controller="Classes" asp-action="Upsert" asp-route-classId="@Model.ClassKey">Добавить дисциплину</a>
+@if (Model.disciplines.Count() != 0)
+{
+    @foreach (var item in Model.disciplines)
+    {
+        <h4>
+            <a asp-controller="Disciplines" asp-action="Details" asp-route-id="@item.Id">
+                @Html.DisplayFor(modelItem => item.Subject.Name)
+            </a>
+        </h4>
+        <h6>
+            <a asp-controller="Employees" asp-action="Details" asp-route-id="@item.EmployeeKey">
+                @Html.DisplayFor(modelItem => item.Employee.Account.PersonalData.FullName)
+            </a>
+        </h6>
+        Dictionary<DateTime, int?> DateMark = new Dictionary<DateTime, int?>();
+
+
+        <table class="table-bordered">
+            <thead>
+                @foreach (var lesson in item.Lessons.OrderBy(l => l.DateTime))
+                {
+
+                <th>
+                        @(new @HtmlString(@lesson.DateTime.ToString("ddd,<br> dd.MM")))
+                </th>
+
+                }
+            </thead>
+            @*item.Lessons.ForEach(
+    l =>
+    {
+    DateMark.Add(l.DateTime, l.Marks.FirstOrDefault(m => m.StudentKey == 0)?.Value);
+    });*@
+
+            <tbody>
+                @foreach (var lesson in item.Lessons.OrderBy(l => l.DateTime))
+                {
+
+                <td>
+                        @(lesson.Marks.FirstOrDefault(m=> m.StudentKey == Model.Id)?.Value?.ToString() ?? "_")
+                </td>
+
+                }
+            </tbody>
+        </table>
+
+    }
+
+
+
+}
+else
+{
+    <dt class="col-sm-2">
+        Дисциплины отсутсвуют
+    </dt>
+}

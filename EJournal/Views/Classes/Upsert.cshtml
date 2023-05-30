@@ -1,0 +1,72 @@
+﻿@model EJournal.Models.ViewModels.ClassViewModels.UpSertClassViewModel
+
+@{
+    ViewData["Title"] = "Обновить данные класса";
+    @if (Model.Id == 0)
+    {
+        ViewData["Title"] = "Добавление класса";
+    }
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h4>Class</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-action="Upsert">
+            <input asp-for="Id" hidden />
+            <div asp-validation-summary="ModelOnly" class="text-danger">
+            </div>
+            @if (ViewData["ClassDuplicate"] != null)
+            {
+                <span class="text-danger">Класс @Model.Number @Model.Liter уже существует</span>
+            }
+
+            <div class="form-group">
+                <label asp-for="Number" class="control-label"></label>
+                <input asp-for="Number" class="form-control" />
+                <span asp-validation-for="Number" class="text-danger"></span>
+            </div>
+            
+            
+            <div class="form-group">
+                <label asp-for="Liter" class="control-label"></label>
+                <input asp-for="Liter" class="form-control" />
+                <span asp-validation-for="Liter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeeKey" class="control-label">Сотрудник</label>
+                <select asp-for="EmployeeKey" class="form-control" asp-items="Model.EmployeeDropDown">
+                    <option disabled selected>--Выберите преподавателя--</option>
+                </select>
+                <span asp-validation-for="EmployeeKey" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+
+                @if (Model.Id == 0)
+                {
+                    <input type="submit" value="Создать" class="btn btn-primary" />
+                }
+                else
+                {
+
+                    <input type="submit" value="Обновить" class="btn btn-primary" />
+                }
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Вернуться к списку</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

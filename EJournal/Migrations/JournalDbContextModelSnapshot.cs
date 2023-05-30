@@ -40,7 +40,8 @@ namespace EJournal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("EMail");
+                    b.HasIndex("EMail")
+                        .IsUnique();
 
                     b.HasIndex("TypeUserKey");
 
@@ -53,7 +54,7 @@ namespace EJournal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("EmployeeKey")
+                    b.Property<int?>("EmployeeKey")
                         .HasColumnType("int");
 
                     b.Property<string>("Liter")
@@ -65,9 +66,10 @@ namespace EJournal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Number", "Liter");
-
                     b.HasIndex("EmployeeKey");
+
+                    b.HasIndex("Number", "Liter")
+                        .IsUnique();
 
                     b.ToTable("Classes");
                 });
@@ -89,11 +91,12 @@ namespace EJournal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("SubjectKey", "EmployeeKey", "ClassKey");
-
                     b.HasIndex("ClassKey");
 
                     b.HasIndex("EmployeeKey");
+
+                    b.HasIndex("SubjectKey", "EmployeeKey", "ClassKey")
+                        .IsUnique();
 
                     b.ToTable("Disciplines");
                 });
@@ -169,7 +172,7 @@ namespace EJournal.Migrations
 
                     b.ToTable("Marks", t =>
                         {
-                            t.HasCheckConstraint("Value", "Value >= 0 AND Value <= 5");
+                            t.HasCheckConstraint("Value", "Value >= -1 AND Value <= 5");
                         });
                 });
 
@@ -201,9 +204,10 @@ namespace EJournal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("SNILS");
-
                     b.HasIndex("AccountKey")
+                        .IsUnique();
+
+                    b.HasIndex("SNILS")
                         .IsUnique();
 
                     b.ToTable("PersonalDatas");
@@ -221,7 +225,8 @@ namespace EJournal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Name");
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Roles");
 
@@ -280,9 +285,10 @@ namespace EJournal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Name");
+                    b.HasIndex("Name")
+                        .IsUnique();
 
-                    b.ToTable("Subject");
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("EJournal.Models.TypeUser", b =>
@@ -297,7 +303,8 @@ namespace EJournal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Name");
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("TypeUsers");
 
@@ -345,8 +352,7 @@ namespace EJournal.Migrations
                     b.HasOne("EJournal.Models.Employee", "Employee")
                         .WithMany("Classes")
                         .HasForeignKey("EmployeeKey")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Employee");
                 });

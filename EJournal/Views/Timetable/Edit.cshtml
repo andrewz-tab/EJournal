@@ -1,0 +1,85 @@
+﻿@using Microsoft.AspNetCore.Html;
+@model EJournal.Models.ViewModels.TimetableViewModels.TimetableViewModel
+
+@{
+    ViewData["Title"] = "Редактирование расписания";
+}
+
+<h1>@ViewData["Title"]</h1>
+<form method="get" asp-action="EditByDayId" asp-route-date="date">
+    <div class="form-group">
+        <label asp-for="date" class="control-label"></label>
+        <input asp-for="date" class="form-control" />
+        <span asp-validation-for="date" class="text-danger"></span>
+        <div class="form-group">
+            <input type="submit" value="Выбрать дату" class="btn btn-primary" />
+        </div>
+    </div>
+    @if(ViewData["errors"] != null)
+    {
+        <span class="text-danger">@(new @HtmlString(@ViewData["errors"]?.ToString()))</span>
+    }
+</form>
+
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-action="Edit">
+            <input asp-for="Id" hidden />
+            <input asp-for="date" hidden />
+            <input asp-for="classLessons" hidden />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+            @foreach (var classTable in Model.listSubjects)
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+
+                            </th>
+                            <th>
+                                @classTable.Key.Number @classTable.Key.Liter
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < 8; i++)
+                        {
+                            
+                            <tr>
+                                <td>
+                                    @(i + 1)
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <select asp-for="classLessons[classTable.Key.Id][i]" class="form-control" asp-items="classTable.Value">
+                                            <option selected value="-1">---</option>
+                                        </select>
+                                        <span asp-validation-for="classLessons[classTable.Key.Id][i]" class="text-danger"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+
+            <div class="form-group">
+                    <input type="submit" value="Обновить" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Home" asp-action="Index">Вернуться на главную</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

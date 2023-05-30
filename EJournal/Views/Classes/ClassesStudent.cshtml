@@ -1,0 +1,41 @@
+﻿@model IEnumerable<EJournal.Models.Student>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                ФИО
+            </th>
+            <th>
+                Почта
+            </th>
+            <th>
+                Номер телефона
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Account.PersonalData.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Account.EMail)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Account.PhoneNumber)
+                </td>
+                <td>
+                    <a asp-controller="Students" asp-action="Upsert" asp-route-id="@item.Id">Изменить</a> |
+                    <a asp-controller="Students" asp-action="Details" asp-route-id="@item.Id">Детали</a>
+                    <a asp-controller="Students" asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,6 +1,7 @@
 ﻿using EJournal.Data;
 using EJournal.Models;
-using EJournal.Models.ViewModels;
+using EJournal.Models.ViewModels.EmployeeViewModels;
+using EJournal.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,59 +11,47 @@ namespace EJournal.Controllers
 {
     public class EmployeesController : Controller
     {
-        private JournalDbContext _dbContext;
-        public EmployeesController(JournalDbContext dbContext)
+        private readonly IEmployeeRepository _dbContext;
+        public EmployeesController(IEmployeeRepository dbContext)
         {
             this._dbContext = dbContext;
         }
         public async Task<IActionResult> Index()
         {
-            IEnumerable<SelectListItem> roles = _dbContext.Roles.Select(r => new SelectListItem
-            {
-                Text = r.Name,
-                Value = r.Id.ToString()
-            }).ToList();
-            IEnumerable<Employee> FullAccounts = _dbContext.Employees
+            IEnumerable<Employee> employees = await _dbContext.GetAllAsync(
+                include: employee =>
+                employee
                 .Include(e => e.Account)
                 .ThenInclude(a => a.PersonalData)
                 .Include(e => e.Roles)
-                .ToList();
-            return View(FullAccounts);
+                );
+            return View(employees);
         }
 
 
         public async Task<IActionResult> Upsert(int? id)
         {
-            UpSertEmployeeViewModel EmployeeAccount = new UpSertEmployeeViewModel();
-            IEnumerable<SelectListItem> roles = _dbContext.Roles.Select(r => new SelectListItem
-            {
-                Text = r.Name,
-                Value = r.Id.ToString()
-            }).ToList();
-            MultiSelectList roleMultpleSelectList = new MultiSelectList(roles.OrderBy(r => r.Text), "Value", "Text");
-            EmployeeAccount = new UpSertEmployeeViewModel
+            UpSertEmployeeViewModel employeeVM = new UpSertEmployeeViewModel();
+            IEnumerable<SelectListItem> roleList = _dbContext.GetAllRolesList();
+            MultiSelectList roleMultpleSelectList = new MultiSelectList(roleList.OrderBy(r => r.Text), "Value", "Text");
+            employeeVM = new UpSertEmployeeViewModel
             {
                 RoleMultpleSelectList = roleMultpleSelectList
             };
             if (id  == null)
             {
-                EmployeeAccount.Id = 0;
-                return View(EmployeeAccount);
+                employeeVM.Id = 0;
+                return View(employeeVM);
             }
             else
             {
-                Employee employee = await _dbContext.Employees.FirstOrDefaultAsync(e => e.Id == id);
+                Employee employee = await _dbContext.FirstOrDefaultAsync(filter: e => e.Id == id);
                 if(employee == null)
                 {
                     return NotFound();
                 }
-                await _dbContext.Entry(employee).Reference(e => e.Account).LoadAsync();
-                await _dbContext.Entry(employee.Account).Reference(a => a.PersonalData).LoadAsync();
-                await _dbContext.Entry(employee).Collection(e => e.Roles).LoadAsync();
-                EmployeeAccount.SetEmployee(employee, roleMultpleSelectList);
-
-
-                return View(EmployeeAccount);
+                employeeVM.SetEmployee(employee, roleMultpleSelectList);
+                return View(employeeVM);
             }
         }
 
@@ -70,42 +59,103 @@ namespace EJournal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upsert(UpSertEmployeeViewModel inputAccountEmployee)
         {
-
+            bool isValid = true;
             ModelState.Remove("RoleMultpleSelectList");
             if (ModelState.IsValid)
             {
-                List<Role> SelectedRoles = _dbContext.Roles.Where(r => inputAccountEmployee.RoleIds.Contains(r.Id)).ToList();
-                TypeUser typeUser = await _dbContext.TypeUsers.FirstOrDefaultAsync(tu => tu.Name == "Сотрудник");
-                if (inputAccountEmployee.Id == 0)
+                IEnumerable<Role> SelectedRoles = _dbContext.GetSelectedRoles(inputAccountEmployee.RoleIds.ToArray());
+                    if (_dbContext.Any(e => e.Account.EMail == inputAccountEmployee.EMail && e.Id != inputAccountEmployee.Id) && inputAccountEmployee.EMail != null)
+                    {
+                        ViewData["EmailDuplicate"] = true;
+                        isValid = false;
+                    }
+                    if (_dbContext.Any(e => e.Account.PhoneNumber == inputAccountEmployee.PhoneNumber && e.Id != inputAccountEmployee.Id) && inputAccountEmployee.PhoneNumber != null)
+                    {
+                        ViewData["PhoneDuplicate"] = true;
+                        isValid = false;
+                    }
+                    if (_dbContext.Any(e => e.Account.PersonalData.PassId == inputAccountEmployee.PassId && e.Id != inputAccountEmployee.Id) && inputAccountEmployee.PassId != null)
+                    {
+                        ViewData["PassDuplicate"] = true;
+                        isValid = false;
+                    }
+                    if (_dbContext.Any(e => e.Account.PersonalData.SNILS == inputAccountEmployee.SNILS && e.Id != inputAccountEmployee.Id) && inputAccountEmployee.SNILS != null)
+                    {
+                        ViewData["SNILSDuplicate"] = true;
+                        isValid = false;
+                    }
+
+                if (isValid)
                 {
-                    Employee newEmployee = inputAccountEmployee.CreateEmployee(typeUser, SelectedRoles);
-                    await _dbContext.Employees.AddAsync(newEmployee);
+                    if (inputAccountEmployee.Id == 0)
+                    {
+                        Employee newEmployee = inputAccountEmployee.CreateEmployee(SelectedRoles);
+                        await _dbContext.AddAsync(newEmployee);
+                    }
+                    else
+                    {
+                        Employee employee = await _dbContext.FirstOrDefaultAsync(filter: e => e.Id == inputAccountEmployee.Id);
+                        if (employee == null)
+                        {
+                            return NotFound();
+                        }
+                        inputAccountEmployee.GetCopy(employee, SelectedRoles);
+                        await _dbContext.UpdateAsync(employee);
+                    }
+                    await _dbContext.SaveAsync();
+
+                    return RedirectToAction("Index");
+                }
+            }
+            IEnumerable<SelectListItem> roleList = _dbContext.GetAllRolesList();
+            MultiSelectList roleMultpleSelectList = new MultiSelectList(roleList.OrderBy(r => r.Text), "Value", "Text");
+            inputAccountEmployee.RoleMultpleSelectList = roleMultpleSelectList;
+            return View(inputAccountEmployee);
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if(id == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                Employee employee = await _dbContext.FirstOrDefaultAsync(isDetail: true, e => e.Id == id);
+                if(employee == null)
+                {
+                    return NotFound();
+                }
+                DetailsEmloyeeViewModel detailsEmloyee = new DetailsEmloyeeViewModel();
+                detailsEmloyee.SetEmployee(employee);
+                return View(detailsEmloyee);
+            }
+        }
+        public async Task<IActionResult> Delete(int? id, string? redirectUrl)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                Employee employee = await _dbContext.FirstOrDefaultAsync(filter: e => e.Id == id);
+                if (employee == null)
+                {
+                    return NotFound();
+                }
+                _dbContext.Remove(employee);
+                await _dbContext.SaveAsync();
+                if (redirectUrl == null)
+                {
+                    return RedirectToAction("Index");
                 }
                 else
                 {
-                    Employee employee = await _dbContext.Employees.FirstOrDefaultAsync(e => e.Id == inputAccountEmployee.Id);
-                    if (employee == null)
-                    {
-                        return NotFound();
-                    }
-                    await _dbContext.Entry(employee).Reference(e => e.Account).LoadAsync();
-                    await _dbContext.Entry(employee.Account).Reference(a => a.PersonalData).LoadAsync();
-                    await _dbContext.Entry(employee).Collection(e => e.Roles).LoadAsync();
-                    inputAccountEmployee.GetCopy(employee, SelectedRoles);
-                    _dbContext.Employees.Update(employee);
+                    return Redirect(redirectUrl);
                 }
-                await _dbContext.SaveChangesAsync();
-                return RedirectToAction("Index");
             }
-            return View(inputAccountEmployee);
-
         }
 
-        public async Task<IActionResult> Create(UpSertEmployeeViewModel? inputAccountEmployee)
-        {
-            return RedirectToAction("Upsert");
-        }
-
-        
     }
 }

@@ -5,6 +5,7 @@ namespace EJournal.Models
     public class Student
     {
         public int Id { get; set; }
+        [DisplayName("Класс")]
         public int ClassKey { get; set; }
         public Class Class { get; set; }
         [DisplayName("Описание")]

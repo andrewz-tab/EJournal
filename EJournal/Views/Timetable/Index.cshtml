@@ -1,0 +1,79 @@
+﻿@model EJournal.Models.ViewModels.TimetableViewModels.TimetableViewModel
+
+@{
+    ViewData["Title"] = "Расписание";
+}
+
+<h1>@ViewData["Title"]</h1>
+<form method="get" asp-action="ByDayId" asp-route-date="date">
+    <div class="form-group">
+        <label asp-for="date" class="control-label"></label>
+        <input asp-for="date" class="form-control" />
+        <span asp-validation-for="date" class="text-danger"></span>
+        <div class="form-group">
+            <input type="submit" value="Выбрать дату" class="btn btn-primary" />
+        </div>
+    </div>
+</form>
+<a asp-action="EditByDayId" asp-route-dayId="@Model.Id">Перейти к редактированию расписания</a>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <section>
+
+            @{
+                int j = 0;
+            }
+            @foreach (var classTable in Model.listSubjects)
+            {
+                <article>
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+
+                                </th>
+                                <th>
+                                    @classTable.Key.Number @classTable.Key.Liter
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < 8; i++)
+                            {
+
+                                <tr>
+                                    <td>
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        @classTable.Value.FirstOrDefault(d => d.Value == Model.classLessons[classTable.Key.Id][i].ToString())?.Text
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </article>
+                j++;
+                if (j == 4)
+                {
+                    j = 0;
+                }
+            }
+        </section>
+
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Home" asp-action="Index">Вернуться на главную</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
