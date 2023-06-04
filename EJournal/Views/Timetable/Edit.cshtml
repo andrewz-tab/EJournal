@@ -9,38 +9,46 @@
 <form method="get" asp-action="EditByDayId" asp-route-date="date">
     <div class="form-group">
         <label asp-for="date" class="control-label"></label>
-        <input asp-for="date" class="form-control" />
+        <input type="date" asp-for="date" class="form-control" />
         <span asp-validation-for="date" class="text-danger"></span>
-        <div class="form-group">
-            <input type="submit" value="Выбрать дату" class="btn btn-primary" />
-        </div>
     </div>
+    <p></p>
+        <div class="form-group">
+            <input type="submit" value="Выбрать дату" class="btn btn-primary our-link" />
+        </div>
+    
     @if(ViewData["errors"] != null)
     {
         <span class="text-danger">@(new @HtmlString(@ViewData["errors"]?.ToString()))</span>
     }
 </form>
 
+<p>
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary our-link">Вернуться на главную</a>
+</div>
+</p>
 
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div >
         <form method="post" asp-action="Edit">
             <input asp-for="Id" hidden />
             <input asp-for="date" hidden />
             <input asp-for="classLessons" hidden />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-
-            @foreach (var classTable in Model.listSubjects)
+            <section class="tablerotation">
+                @foreach (var classTable in Model.listSubjects.OrderBy(classt => classt.Key.Number).ThenBy(classt => classt.Key.Liter))
             {
-                <table class="table table-bordered">
+                <article class = "articlerotation">
+                        <table class="table table-bordered tablecolor">
                     <thead>
                         <tr>
                             <th>
 
                             </th>
-                            <th>
+                            <th class="class-lesson-th">
                                 @classTable.Key.Number @classTable.Key.Liter
                             </th>
                         </tr>
@@ -65,18 +73,16 @@
                         }
                     </tbody>
                 </table>
+                        </article>
             }
-
+                </section >
             <div class="form-group">
-                    <input type="submit" value="Обновить" class="btn btn-primary" />
+                <input type="submit" value="Обновить" class="btn btn-primary our-link" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-controller="Home" asp-action="Index">Вернуться на главную</a>
-</div>
 
 @section Scripts {
     @{

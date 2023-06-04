@@ -25,7 +25,7 @@ namespace EJournal.Models.ViewModels.ClassViewModels
             Number = Class.Number;
             EmployeeKey = Class.EmployeeKey;
             Liter = Class.Liter;
-            EmployeeName = Class.Employee.Account.PersonalData.FullName;
+            EmployeeName = Class.Employee?.Account.PersonalData.FullName ?? "Отсутствует";
             students = Class.Students;
             disciplines = Class.Disciplines;
         }

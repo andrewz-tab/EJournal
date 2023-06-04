@@ -44,8 +44,11 @@ namespace EJournal.Repository
             {
                 await _dbContext.Entry(Class).Collection(c => c.Students).LoadAsync();
                 await _dbContext.Entry(Class).Reference(c => c.Employee).LoadAsync();
-                await _dbContext.Entry(Class.Employee).Reference(e => e.Account).LoadAsync();
-                await _dbContext.Entry(Class.Employee.Account).Reference(a => a.PersonalData).LoadAsync();
+                if (Class.Employee != null)
+                {
+                    await _dbContext.Entry(Class.Employee).Reference(e => e.Account).LoadAsync();
+                    await _dbContext.Entry(Class.Employee.Account).Reference(a => a.PersonalData).LoadAsync();
+                }
                 await _dbContext.Students.Include(s => s.Account).ThenInclude(a => a.PersonalData).LoadAsync();
                 await _dbContext.Disciplines.Include(d => d.Subject).Include(d => d.Employee).ThenInclude(e => e.Account).ThenInclude(a => a.PersonalData).LoadAsync();
             }

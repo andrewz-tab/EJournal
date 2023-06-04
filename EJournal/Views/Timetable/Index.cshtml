@@ -1,41 +1,52 @@
-﻿@model EJournal.Models.ViewModels.TimetableViewModels.TimetableViewModel
+﻿@using Microsoft.AspNetCore.Http
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+@model EJournal.Models.ViewModels.TimetableViewModels.TimetableViewModel
 
 @{
     ViewData["Title"] = "Расписание";
 }
-
 <h1>@ViewData["Title"]</h1>
 <form method="get" asp-action="ByDayId" asp-route-date="date">
     <div class="form-group">
         <label asp-for="date" class="control-label"></label>
-        <input asp-for="date" class="form-control" />
+        <input type="date" asp-for="date" class="form-control" />
         <span asp-validation-for="date" class="text-danger"></span>
-        <div class="form-group">
-            <input type="submit" value="Выбрать дату" class="btn btn-primary" />
         </div>
-    </div>
+        <p></p>
+        <div class="form-group">
+            <input type="submit" value="Выбрать дату" class="btn btn-primary our-link" />
+        </div>
 </form>
-<a asp-action="EditByDayId" asp-route-dayId="@Model.Id">Перейти к редактированию расписания</a>
-
+@if (HttpContextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+{
+    var user = HttpContextAccessor.HttpContext.User;
+    if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+    {
+        <p></p>
+        <a asp-action="EditByDayId" asp-route-dayId="@Model.Id" class="btn btn-primary our-link">Перейти к редактированию расписания</a>
+        <p></p>
+    }
+}
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <section>
+    <div >
+        <section class="tablerotation">
 
             @{
                 int j = 0;
             }
-            @foreach (var classTable in Model.listSubjects)
+            @foreach (var classTable in Model.listSubjects.OrderBy(classt=> classt.Key.Number).ThenBy(classt => classt.Key.Liter))
             {
-                <article>
+                <article class="articlerotation">
 
-                    <table class="table table-bordered">
+                    <table class="table table-bordered tablecolor">
                         <thead>
                             <tr>
                                 <th>
 
                                 </th>
-                                <th>
+                                <th class="class-lesson-th">
                                     @classTable.Key.Number @classTable.Key.Liter
                                 </th>
                             </tr>
@@ -48,7 +59,7 @@
                                     <td>
                                         @(i + 1)
                                     </td>
-                                    <td>
+                                    <td class="class-lesson-th">
                                         @classTable.Value.FirstOrDefault(d => d.Value == Model.classLessons[classTable.Key.Id][i].ToString())?.Text
                                     </td>
                                 </tr>
@@ -64,12 +75,11 @@
                 }
             }
         </section>
-
     </div>
 </div>
 
 <div>
-    <a asp-controller="Home" asp-action="Index">Вернуться на главную</a>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary our-link">Вернуться на главную</a>
 </div>
 
 @section Scripts {

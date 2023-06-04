@@ -1,63 +1,92 @@
-﻿@model EJournal.Models.ViewModels.ClassViewModels.DetailsClassViewModel
+﻿@using Microsoft.AspNetCore.Http
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+@model EJournal.Models.ViewModels.ClassViewModels.DetailsClassViewModel
+
 
 @{
     ViewData["Title"] = "Данные о классе";
 }
+@if (HttpContextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+{
+    var user = HttpContextAccessor.HttpContext.User;
 
-<h1>@ViewData["Title"]</h1>
+    <h1>@ViewData["Title"]</h1>
 
-<h4>Class</h4>
-<div>
-    <a asp-action="Index">Вернуться к списку</a> <a asp-action="Upsert" asp-route-id="@Model.Id">Обновить даныне</a>
-</div>
-<hr />
-
-<div class="row">
-    <div class="col-md-4">
-
-        <input asp-for="Id" hidden />
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EmployeeName)
-        </dt>
-        <dd class="col-sm-10">
-            <a asp-controller="Employees" asp-action="Details" asp-route-id="@Model.EmployeeKey">
-            @Html.DisplayFor(model => model.EmployeeName)
-            </a>
-        </dd>
-
+    <div>
+        @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+        {
+            <a asp-action="Index" class="btn btn-primary our-link">Вернуться к списку</a>
+        }
+        @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+        {
+            <a asp-action="Upsert" asp-route-id="@Model.Id" class="btn btn-primary our-link">Обновить даныне</a>
+        }
     </div>
-</div>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-4">
+
+            <input asp-for="Id" hidden />
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd >
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.EmployeeName)
+            </dt>
+            <dd >
+                @if (Model.EmployeeKey != null)
+                {
+                    <a asp-controller="Employees" asp-action="Details" asp-route-id="@Model.EmployeeKey" class="withour-under-line">
+                        @Html.DisplayFor(model => model.EmployeeName)
+                    </a>
+                }
+                else
+                {
+                    <text>Отсутствует</text>
+                }
+            </dd>
+
+        </div>
+    </div>
 
 
-<hr />
-<h4>Ученики класса</h4>
-<a asp-controller="Students" asp-action="Upsert" asp-route-classId="@Model.Id">Добавить ученика</a>
-@if (Model.students.Count() != 0)
-{
-    await Html.RenderPartialAsync("ClassesStudent", Model.students);
-}
-else
-{
-    <dt class="col-sm-2">
-        Учащиеся отсутсвуют
-    </dt>
-}
-<hr />
-<h4>Дисциплины</h4>
-<a asp-controller="Disciplines" asp-action="Upsert" asp-route-classId="@Model.Id">Добавить дисциплину</a>
-@if (Model.disciplines.Count() != 0)
-{
-    await Html.RenderPartialAsync("ClassesDiscipline", Model.disciplines);
-}
-else
-{
-    <dt class="col-sm-2">
-        Дисциплины отсутсвуют
-    </dt>
+    <hr />
+    <h4>Ученики класса</h4>
+    @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+    {
+        <a asp-controller="Students" asp-action="Upsert" asp-route-classId="@Model.Id" class="btn btn-primary our-link">Добавить ученика</a>
+    }
+    <p></p>
+    @if (Model.students.Count() != 0)
+    {
+        await Html.RenderPartialAsync("ClassesStudent", Model.students);
+    }
+    else
+    {
+        <dt class="col-sm-4">
+            Учащиеся отсутсвуют
+        </dt>
+    }
+    <hr />
+    <h4>Дисциплины</h4>
+    @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+    {
+        <a asp-controller="Disciplines" asp-action="Upsert" asp-route-classId="@Model.Id" class="btn btn-primary our-link">Добавить дисциплину</a>
+    }
+    <p></p>
+    @if (Model.disciplines.Count() != 0)
+    {
+        await Html.RenderPartialAsync("ClassesDiscipline", Model.disciplines);
+    }
+    else
+    {
+        <dt class="col-sm-4">
+            Дисциплины отсутсвуют
+        </dt>
+    }
 }

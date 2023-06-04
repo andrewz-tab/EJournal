@@ -1,13 +1,47 @@
 ﻿using EJournal.Data;
 using EJournal.Models;
+using System.Globalization;
 
 namespace EJournal.Repository.IRepository
 {
     public interface ITimetableRepository
     {
         Task<IEnumerable<Class>> GetClassesTimetableByDay(DateTime date);
-        Task<IEnumerable<Lesson>> GetTimetalbeByWeek(int? weekId);
+        Task<Employee> GetTeacher(int teacherId);
+		Task<Class> GetClass(int classId);
+		Task<IEnumerable<Lesson>> GetTimetalbeDiariesByWeek(int classId, string? weekId, int? studentId);
+        Task<IEnumerable<Lesson>> GetTimetableByWeekForTeacher(int teacherId, string? weekId);
         Task SaveAsync();
+
+        public static DateTime GetDateTimeByWeekId(string? weekId)
+        {
+
+            DateTime today = DateTime.Today;
+            int WeekIdDefault = 1;
+            DateTime defaultDay = new DateTime(2022, 12, 26);
+
+            DateTime currentBegin = today;
+            if (weekId != null)
+            {
+                var week = weekId.Split("-W");
+                try
+                {
+                    currentBegin = ISOWeek.ToDateTime(Convert.ToInt32(week[0]), Convert.ToInt32(week[1]), DayOfWeek.Monday);
+                    return currentBegin;
+                }
+                catch
+                {
+
+                }
+            }
+            while (currentBegin.DayOfWeek != DayOfWeek.Monday)
+            {
+                currentBegin = currentBegin.AddDays(-1);
+            }
+
+            return currentBegin;
+        }
+        
 
         public static DateTime GetDateTimeByDayId(int? dayId)
         {
@@ -19,7 +53,6 @@ namespace EJournal.Repository.IRepository
             {
                 currentDay = defaultDay.AddDays((int)dayId - defaultDayId);
             }
-            //dayIdOut = (currentDay - defaultDay).Days + 1;
             return currentDay;
         }
         public static int GetDayId(DateTime? date = null)
@@ -35,5 +68,6 @@ namespace EJournal.Repository.IRepository
             int dayId = (currentDay - defaultDay).Days + 1;
             return dayId;
         }
+
     }
 }

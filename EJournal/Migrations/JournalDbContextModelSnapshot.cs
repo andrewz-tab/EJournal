@@ -29,6 +29,12 @@ namespace EJournal.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("Login")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("longtext");
 
@@ -36,6 +42,12 @@ namespace EJournal.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("isActivate")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("isChanged")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("isRequiredChangePassword")
                         .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
@@ -46,6 +58,19 @@ namespace EJournal.Migrations
                     b.HasIndex("TypeUserKey");
 
                     b.ToTable("Accounts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 101,
+                            EMail = "qwerty@mail.com",
+                            Login = "admin",
+                            Password = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+                            TypeUserKey = 2,
+                            isActivate = true,
+                            isChanged = false,
+                            isRequiredChangePassword = false
+                        });
                 });
 
             modelBuilder.Entity("EJournal.Models.Class", b =>
@@ -119,6 +144,13 @@ namespace EJournal.Migrations
                         .IsUnique();
 
                     b.ToTable("Employees");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 101,
+                            AccountKey = 101
+                        });
                 });
 
             modelBuilder.Entity("EJournal.Models.Lesson", b =>
@@ -211,6 +243,17 @@ namespace EJournal.Migrations
                         .IsUnique();
 
                     b.ToTable("PersonalDatas");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 101,
+                            AccountKey = 101,
+                            DateBirth = new DateTime(2002, 12, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FullName = "Хузахметов Андрей Александрович",
+                            SNILS = "12345678901",
+                            gender = 0
+                        });
                 });
 
             modelBuilder.Entity("EJournal.Models.Role", b =>
@@ -334,6 +377,13 @@ namespace EJournal.Migrations
                     b.HasIndex("RolesId");
 
                     b.ToTable("EmployeeRole", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            EmployeesId = 101,
+                            RolesId = 3
+                        });
                 });
 
             modelBuilder.Entity("EJournal.Models.Account", b =>

@@ -2,6 +2,7 @@
 using EJournal.Models;
 using EJournal.Models.ViewModels.EmployeeViewModels;
 using EJournal.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +16,15 @@ namespace EJournal.Controllers
         {
             this._dbContext = dbContext;
         }
+
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Index()
         {
             IEnumerable<Subject> subjects = await _dbContext.GetAllAsync();
             return View(subjects);
         }
 
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(int? id)
         {
             Subject subject = new Subject();
@@ -43,6 +47,7 @@ namespace EJournal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(Subject inputSubject)
         {
             bool isValid = true;
@@ -74,6 +79,8 @@ namespace EJournal.Controllers
             }
             return View(inputSubject);
         }
+
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Details(int? id)
         {
             Subject subject = new Subject();
@@ -94,7 +101,9 @@ namespace EJournal.Controllers
                 return View(subject);
             }
         }
-        public async Task<IActionResult> Delete(int? id, string? redirectUrl)
+
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
+        public async Task<IActionResult> Delete(int? id, string? returnUrl)
         {
             Subject subject = await _dbContext.FirstOrDefaultAsync(filter: s => s.Id == id);
             if (subject == null)
@@ -103,13 +112,13 @@ namespace EJournal.Controllers
             }
             _dbContext.Remove(subject);
             await _dbContext.SaveAsync();
-            if (redirectUrl == null)
+            if (returnUrl == null)
             {
                 return RedirectToAction("Index");
             }
             else
             {
-                return Redirect(redirectUrl);
+                return Redirect(returnUrl);
             }
         }
     }

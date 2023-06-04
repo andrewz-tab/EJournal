@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using static EJournal.Models.PersonalData;
 using System.ComponentModel;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace EJournal.Models.ViewModels.StudentViewModels
 {
@@ -8,22 +10,37 @@ namespace EJournal.Models.ViewModels.StudentViewModels
     {
         public int Id { get; set; } = 0;
         [DisplayName("ФИО")]
+        [Required(ErrorMessage = "Укажите ФИО сотрудника")]
+        [StringLength(100, ErrorMessage = "Максимальное значение символов - 100")]
         public string FullName { get; set; }
         [DisplayName("Дата рождения")]
+        [Required(ErrorMessage = "Укажите дату рождения")]
         public DateTime DateBirth { get; set; } = DateTime.Now;
         [DisplayName("Пол")]
+        [Required(ErrorMessage = "Выберите пол")]
         public Gender gender { get; set; } = Gender.Men;
+        //[Remote(action: "CheckEmail", controller: "Home", ErrorMessage = "Email уже используется")]
         public string? PassId { get; set; }
+        //[Remote(action: "CheckEmail", controller: "Home", ErrorMessage = "Email уже используется")]
         [DisplayName("СНИЛС")]
+        [Required(ErrorMessage = "Укажите значение СНИЛС")]
+        [RegularExpression(@"[0-9]{11}", ErrorMessage = "Введите СНИЛС без пробелов и тире")]
         public string SNILS { get; set; }
         [DisplayName("Описание")]
+        [Range(0, 100, ErrorMessage = "Максимальное значение символов - 100")]
         public string? Description { get; set; }
+        //[Remote(action: "CheckEmail", controller: "Home", ErrorMessage = "Email уже используется")]
         [DisplayName("Электронная почта")]
+        [EmailAddress(ErrorMessage = "Неверный формат написания электронной почты")]
+        [Required(ErrorMessage = "Укажите электронную почту")]
         public string EMail { get; set; }
+        //[Remote(action: "CheckEmail", controller: "Home", ErrorMessage = "Email уже используется")]
         [DisplayName("Номер телефона")]
+        [Phone(ErrorMessage = "Неверный формат номера")]
         public string? PhoneNumber { get; set; }
         public bool isActivate { get; set; } = false;
         [DisplayName("Класс")]
+        [Required(ErrorMessage = "Укажите класс ученика")]
         public int ClassKey { get; set; }
         public IEnumerable<SelectListItem> ClassList { get; set; }
         public UpsertStudentViewModel() { }
@@ -68,7 +85,7 @@ namespace EJournal.Models.ViewModels.StudentViewModels
             student.Description = Description;
             student.Account.isActivate = isActivate;
             student.Account.PhoneNumber = PhoneNumber;
-            student.Account.EMail = EMail;
+            student.Account.EMail = EMail.ToLower();
             student.Account.PersonalData.FullName = FullName;
             student.Account.PersonalData.PassId = PassId;
             student.Account.PersonalData.SNILS = SNILS;

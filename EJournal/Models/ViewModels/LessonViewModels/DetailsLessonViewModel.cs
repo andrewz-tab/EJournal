@@ -11,6 +11,9 @@ namespace EJournal.Models.ViewModels.LessonViewModel
     {
         public int Id { get; set; } = 0;
         public int DisciplineId { get; set; }
+        public int ClassId { get; set; }
+        public int? EmployeeClassManagerId { get; set; }
+        public int EmployeeId { get; set; }
         [DisplayName("Учитель")]
         public string EmployeeName { get; set; }
         [DisplayName("Класс")]
@@ -42,6 +45,9 @@ namespace EJournal.Models.ViewModels.LessonViewModel
         }
         public void SetLesson(Lesson lesson)
         {
+            EmployeeClassManagerId = lesson.Discipline.Class?.EmployeeKey;
+            EmployeeId = lesson.Discipline.EmployeeKey;
+            ClassId = lesson.Discipline.ClassKey;
             HomeWork = lesson.HomeWork;
             DisciplineId = lesson.DisciplineKey;
             Id = lesson.Id;

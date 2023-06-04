@@ -1,5 +1,7 @@
 ﻿using EJournal.Models;
+using EJournal.Service.Implementations;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace EJournal.Data
 {
@@ -105,7 +107,41 @@ namespace EJournal.Data
                 new TypeUser { Id = 1, Name = "Ученик" },
                 new TypeUser { Id = 2, Name = "Сотрудник"}
                 );
-        }
+            modelBuilder.Entity<Account>().HasData(
+                new Account
+                {
+                    Id = 101,
+                    EMail = "qwerty@mail.com",
+                    isActivate = true,
+                    Login = "admin",
+                    isChanged = false,
+                    isRequiredChangePassword =false,
+					TypeUserKey = 2,
+                    Password = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+				});
+            modelBuilder.Entity<PersonalData>().HasData(
+                new PersonalData
+                {
+                    Id = 101,
+                    FullName = "Хузахметов Андрей Александрович",
+                    DateBirth = new DateTime(2002, 12, 20),
+                    gender = PersonalData.Gender.Men,
+                    SNILS = "12345678901",
+                    AccountKey = 101,
+                });
+			modelBuilder.Entity<Employee>().HasData(
+				new Employee
+				{
+					Id=101,
+                    AccountKey = 101
+				});
+			modelBuilder.Entity("EmployeeRole").HasData(
+				new
+				{
+					EmployeesId = 101,
+					RolesId = 3
+				});
+		}
 
-    }
+	}
 }

@@ -1,16 +1,105 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+@{
     ViewData["Title"] = "Home Page";
 }
 
+@if (HttpContextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+{
+    <h1 id="indexh1">Главное меню</h1>
+    var user = HttpContextAccessor.HttpContext.User;
+    @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+    {
+        <div class="a-block">
+            <button class="index-bnt btn-2"><a class="nav-link text-white" asp-area="" asp-controller="Classes" asp-action="Index">Классы</a></button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2"><a class="nav-link text-white" asp-area="" asp-controller="Employees" asp-action="Index">Сотрудники</a></button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2"><a class="nav-link text-white" asp-area="" asp-controller="Students" asp-action="Index">Ученики</a></button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2"> <a class="nav-link text-white" asp-area="" asp-controller="Subjects" asp-action="Index">Предметы</a></button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2"><a class="nav-link text-white" asp-area="" asp-controller="Disciplines" asp-action="Index">Дисциплины</a></button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2">
+                <a class="nav-link text-white" asp-area="" asp-controller="Timetable" asp-action="ByDayId">Расписание</a>
+            </button>
+        </div>
 
-<a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Классы</a>
-<a class="nav-link text-dark" asp-area="" asp-controller="Employees" asp-action="Index">Сотрудники</a>
-<a class="nav-link text-dark" asp-area="" asp-controller="Subjects" asp-action="Index">Предметы</a>
-<a class="nav-link text-dark" asp-area="" asp-controller="Disciplines" asp-action="Index">Дисциплины</a>
-<a class="nav-link text-dark" asp-area="" asp-controller="Timetable" asp-action="ByDayId">Расписание</a>
 
+        @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && claim.Value == WC.AdminRole))
+        {
+            <div class="a-block">
+            <button class="index-bnt btn-2">
+            <a class="nav-link text-white" asp-area="" asp-controller="Backups" asp-action="Index">Резервное копирование базы данных</a>
+                </button>
+            </div>
 
-@*<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>*@
+        }
+        }
+    else if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && claim.Value == WC.TeacherRole))
+    {
+        int teacherId;
+        if (int.TryParse(user.FindFirstValue(WC.EmployeeId), out teacherId))
+        {
+            <div class="a-block">
+                <button class="index-bnt btn-2">
+                    <a class="nav-link text-white" asp-controller="Timetable" asp-action="ByTeacher" asp-route-teacherId="@teacherId">Мое расписание</a>
+                </button>
+            </div>
+        }
+        <div class="a-block">
+            <button class="index-bnt btn-2">
+                <a class="nav-link text-white" asp-area="" asp-controller="Disciplines" asp-action="Index">Действующие дисциплины</a>
+            </button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2">
+                <a class="nav-link text-white" asp-area="" asp-controller="Timetable" asp-action="ByDayId">Расписание классов</a>
+            </button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2">
+                <a class="nav-link text-white" asp-area="" asp-controller="Employees" asp-action="Index">Сотрудники</a>
+            </button>
+        </div>
+    }
+    else if (user.HasClaim(claim => claim.Type == WC.TypeUser && claim.Value == WC.StudentUser))
+    {
+        <div class="a-block">
+            <button class="index-bnt btn-2">
+                <a class="nav-link text-white" asp-area="" asp-controller="Timetable" asp-action="Diaries">Дневник</a>
+            </button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2">
+                <a class="nav-link text-white" asp-area="" asp-controller="Timetable" asp-action="ByDayId">Расписание</a>
+            </button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2">
+                <a class="nav-link text-white" asp-area="" asp-controller="Classes" asp-action="Details" asp-route-id="@user.FindFirst(WC.ClassId)?.Value">Класс</a>
+            </button>
+        </div>
+        <div class="a-block">
+            <button class="index-bnt btn-2">
+                <a class="nav-link text-white" asp-area="" asp-controller="Employees" asp-action="Index">Учителя</a>
+            </button>
+        </div>
+    }
+    else
+    {
+        <p class="text-danger">Ошибка акканта, обратитесь к администрации школы</p>
+    }
+}
+else
+{
+    <p class="text-danger">Выполните авторизацию</p>
+}
+

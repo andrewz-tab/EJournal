@@ -3,9 +3,12 @@ using EJournal.Models;
 using EJournal.Models.ViewModels.DisciplineViewModels;
 using EJournal.Models.ViewModels.EmployeeViewModels;
 using EJournal.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using MySqlX.XDevAPI;
+using System.Security.Claims;
 
 namespace EJournal.Controllers
 {
@@ -17,6 +20,7 @@ namespace EJournal.Controllers
             this._dbContext = dbContext;
         }
         [HttpGet]
+        [Authorize(Policy = WC.PolicyOnlyForEmployee)]
         public async Task<IActionResult> Index()
         {
             IEnumerable<Discipline> disciplines = await _dbContext.GetAllAsync(
@@ -31,6 +35,7 @@ namespace EJournal.Controllers
             return View(disciplines);
         }
         [HttpGet]
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(int? id)
         {
             IEnumerable<SelectListItem> classList = _dbContext.GetAllClassesList();
@@ -55,6 +60,7 @@ namespace EJournal.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(UpsertDisciplineViewModel inputDiscipline)
         {
             bool isValid = true;
@@ -99,6 +105,8 @@ namespace EJournal.Controllers
             inputDiscipline.ClassDropDown = _dbContext.GetAllClassesList();
             return View(inputDiscipline);
         }
+
+        [Authorize(Policy = WC.PolicyOnlyForEmployee)]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -112,12 +120,22 @@ namespace EJournal.Controllers
                 {
                     return NotFound();
                 }
+                var user = User;
+                var roles = user.FindAll(ClaimTypes.Role);
+                if (roles.Count() == 1 && roles.FirstOrDefault()?.Value == WC.TeacherRole)
+                {
+                    if(!(user.FindFirstValue(WC.EmployeeId) == discipline.EmployeeKey.ToString() || user.FindFirstValue(WC.EmployeeId) == discipline.Class.EmployeeKey.ToString()))
+                    {
+                        return NotFound();
+                    }
+                }
                 DetailsDisciplineViewModel detailsDiscipline = new DetailsDisciplineViewModel();
                 detailsDiscipline.SetDiscipline(discipline);
                 return View(detailsDiscipline);
             }
         }
 
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Delete(int? id, string? redirectUrl)
         {
             if(id <= 0 || id == null)

@@ -1,0 +1,110 @@
+﻿@model EJournal.Models.ViewModels.TimetableViewModels.TimetableForTeacherViewModel
+
+@{
+	ViewData["Title"] = "Расписание для учителя " + Model.teacherName;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+    <form method="get" asp-action="ByTeacher">
+        <input asp-for="teacherId" hidden/>
+    <div class="form-group">
+            <input type="week" asp-for="weekId" class="form-control" />
+            <span asp-validation-for="weekId" class="text-danger"></span>
+            </div>
+            <p></p>
+        <div class="form-group">
+            <input type="submit" value="Выбрать неделю" class="btn btn-primary" />
+        </div>
+    <p></p>
+</form>
+
+<style type="text/css">
+
+    body {
+        position: relative;
+    }
+
+    .scrollable {
+        overflow-x: scroll;
+        overflow-y: visible;
+    }
+
+
+    .dayofWeek {
+        min-inline-size: 10em;
+        text-align: center;
+        writing-mode: vertical-rl;
+        transform: scale(-1);
+    }
+</style>
+
+<div class="row">
+    <div class="scrollable">
+        <table id="table1" class="table-bordered tablecolor">
+            <thead>
+                <tr>
+                    <th colspan="5">
+                        Месяц @Model.dateBegin.ToString("MMMM")
+                    </th>
+                    <th colspan="5">
+                        Месяц @Model.dateBegin.AddDays(3).ToString("MMMM")
+                    </th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th colspan="2">Предмет</th>
+                    <th>Класс</th>
+                    <th>Домашнее задание</th>
+                    <th></th>
+                    <th colspan="2">Предмет</th>
+                    <th>Класс</th>
+                    <th>Домашнее задание</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    for (int j = 0; j < 3; j++)
+                    {
+
+                        @for (int i = 0; i < 8; i++)
+                        {
+                            <tr>
+
+                                @if (i == 0)
+                                {
+                                    <td class = "tablefirsttd" rowspan="8"><div class="dayofWeek">@Model.dateBegin.AddDays(j).ToString("dddd  d")</div></td>
+                                }
+                                <td >
+                                    @(
+                                    i + 1
+                                        )
+                                </td>
+                                <td class="tablefirsttdd"> @Model.timetable[Model.dateBegin.AddDays(j)].FirstOrDefault(l => l.Index == i)?.Discipline.Subject.Name</td>
+                                <td >@Model.timetable[Model.dateBegin.AddDays(j)].FirstOrDefault(l => l.Index == i)?.Discipline.Class.Name</td>
+                                <td class="tablehomeworktdd">@Model.timetable[Model.dateBegin.AddDays(j)].FirstOrDefault(l => l.Index == i)?.HomeWork</td>
+                                
+
+                                @if (i == 0)
+                                {
+                                    <td class = "tablefirsttd" rowspan="8"><div style="border:none; margin:unset"class="dayofWeek">@Model.dateBegin.AddDays(j + 3).ToString("dddd  d")</div></td>
+                                }
+                                <td>
+                                    @(
+                                    i + 1
+                                        )
+                                </td >
+                                <td class="tablefirsttdd">@Model.timetable[Model.dateBegin.AddDays(j + 3)].FirstOrDefault(l => l.Index == i)?.Discipline.Subject.Name</td>
+                                <td>@Model.timetable[Model.dateBegin.AddDays(j)].FirstOrDefault(l => l.Index == i)?.Discipline.Class.Name</td>
+                                <td class="tablehomeworktdd">@Model.timetable[Model.dateBegin.AddDays(j + 3)].FirstOrDefault(l => l.Index == i)?.HomeWork</td>
+
+
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+	</div>
+
+</div>

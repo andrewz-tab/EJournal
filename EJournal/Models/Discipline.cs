@@ -1,4 +1,6 @@
-﻿namespace EJournal.Models
+﻿using Aspose.Pdf;
+
+namespace EJournal.Models
 {
     public class Discipline
     {
@@ -10,5 +12,6 @@
         public int ClassKey { get; set; }
         public Class Class { get; set; }
         public List<Lesson> Lessons { get; set; } = new();
+
     }
 }

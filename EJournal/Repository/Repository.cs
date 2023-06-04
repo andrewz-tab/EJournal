@@ -117,5 +117,15 @@ namespace EJournal.Repository
                 Text = r.Name
             }).ToList();
         }
+
+        public IEnumerable<SelectListItem> GetAllEmployeesList()
+        {
+            return _dbContext.Employees
+            .Select(e => new SelectListItem
+            {
+                Text = e.Account.PersonalData.FullName,
+                Value = e.Id.ToString()
+            });
+        }
     }
 }

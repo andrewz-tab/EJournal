@@ -1,0 +1,26 @@
+﻿@model EJournal.Models.ViewModels.LoginViewModels.ActivateAccountViewModel
+@{
+    ViewData["Title"] = "Активация аккаунта";
+}
+
+<h1>@ViewData["Title"]</h1>
+@if (ViewData["Error"] != null)
+{
+    <h3>@ViewData["Error"]</h3>
+}
+else
+{
+    <h5>Аккаунт "@Model.FullName" активирован!</h5>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Login)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Login)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Password)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Password)
+    </dd>
+}

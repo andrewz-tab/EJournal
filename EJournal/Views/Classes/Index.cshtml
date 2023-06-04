@@ -1,45 +1,59 @@
-﻿@model IEnumerable<EJournal.Models.Class>
+﻿@using Microsoft.AspNetCore.Http
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<EJournal.Models.Class>
 
 @{
-    ViewData["Title"] = "Classes";
+    ViewData["Title"] = "Список классов";
 }
 
-<h1>Classes</h1>
+<h1>@ViewData["Title"]</h1>
 
-<p>
-    <a asp-controller="Classes" asp-action="Upsert">Создать класс</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Класс
-            </th>
-            <th>
-                Классный руководитель
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+@if (HttpContextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+{
+    var user = HttpContextAccessor.HttpContext.User;
+    @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+    {
+        <p>
+            <a asp-controller="Classes" asp-action="Upsert" class="btn btn-primary our-link">Создать класс</a>
+        </p>
+    }
+    <table id="table1" class="table table-light table-striped table-hover table-bordered table align-middle">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Number)
-                    @Html.DisplayFor(modelItem => item.Liter)
-                </td>
-                <td>
-                    <a asp-controller="Employees" asp-action="Details" asp-route-id="@item.EmployeeKey">
-                    @Html.DisplayFor(modelItem => item.Employee.Account.PersonalData.FullName)
-                    </a>
-                </td>
-                <td>
-                    <a asp-action="Upsert" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                <th>
+                    Класс
+                </th>
+                <th>
+                    Классный руководитель
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Number)
+                        @Html.DisplayFor(modelItem => item.Liter)
+                    </td>
+                    <td>
+                        <a asp-controller="Employees" asp-action="Details" asp-route-id="@item.EmployeeKey" class="nav-link">
+                            @item.Employee?.Account.PersonalData.FullName
+                        </a>
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="nav-link custom-btn btn-7">Подробнее</a>
+                        @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+                        {
+                            <text> | </text>
+                            <a asp-action="Upsert" asp-route-id="@item.Id" class="nav-link custom-btn btn-3">Изменить</a> <text> | </text>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="nav-link custom-btn btn-5">Удалить</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

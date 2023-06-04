@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EJournal.Models.ViewModels.StudentViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EJournal.Controllers
 {
@@ -15,6 +16,7 @@ namespace EJournal.Controllers
         {
             this._dbContext = dbContext;
         }
+        [Authorize(Policy =WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Index()
         {
             IEnumerable<Student> students = await _dbContext.GetAllAsync(
@@ -28,6 +30,7 @@ namespace EJournal.Controllers
         }
 
 
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(int? id, int? classId)
         {
             UpsertStudentViewModel studentVM = new UpsertStudentViewModel();
@@ -56,6 +59,8 @@ namespace EJournal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(UpsertStudentViewModel inputAccountStudent)
         {
             bool isValid = true;
@@ -98,6 +103,7 @@ namespace EJournal.Controllers
                             return NotFound();
                         }
                         inputAccountStudent.GetCopy(student);
+                        student.Account.isChanged = true;
                         await _dbContext.UpdateAsync(student);
                     }
                     await _dbContext.SaveAsync();
@@ -109,7 +115,7 @@ namespace EJournal.Controllers
             inputAccountStudent.ClassList = classList;
             return View(inputAccountStudent);
         }
-
+        [Authorize(Policy = WC.PolicyOnlyForEmployee)]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -128,6 +134,8 @@ namespace EJournal.Controllers
                 return View(detailsEmloyee);
             }
         }
+
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Delete(int? id, string? redirectUrl)
         {
             if (id == null)

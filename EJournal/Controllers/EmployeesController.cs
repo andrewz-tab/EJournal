@@ -2,10 +2,12 @@
 using EJournal.Models;
 using EJournal.Models.ViewModels.EmployeeViewModels;
 using EJournal.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace EJournal.Controllers
 {
@@ -16,6 +18,7 @@ namespace EJournal.Controllers
         {
             this._dbContext = dbContext;
         }
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             IEnumerable<Employee> employees = await _dbContext.GetAllAsync(
@@ -29,6 +32,7 @@ namespace EJournal.Controllers
         }
 
 
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(int? id)
         {
             UpSertEmployeeViewModel employeeVM = new UpSertEmployeeViewModel();
@@ -57,6 +61,7 @@ namespace EJournal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(UpSertEmployeeViewModel inputAccountEmployee)
         {
             bool isValid = true;
@@ -100,6 +105,7 @@ namespace EJournal.Controllers
                             return NotFound();
                         }
                         inputAccountEmployee.GetCopy(employee, SelectedRoles);
+                        employee.Account.isChanged = true;
                         await _dbContext.UpdateAsync(employee);
                     }
                     await _dbContext.SaveAsync();
@@ -113,6 +119,7 @@ namespace EJournal.Controllers
             return View(inputAccountEmployee);
         }
 
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if(id == null)
@@ -126,11 +133,21 @@ namespace EJournal.Controllers
                 {
                     return NotFound();
                 }
+                ///////////////
+                var user = User;
+                var roles = user.FindAll(ClaimTypes.Role);
+                if (user.FindFirstValue(WC.TypeUser) == WC.StudentUser && employee.Roles.Count() == 1 && employee.Roles.First().Name == WC.AdminRole)
+                {
+                    return NotFound();
+                }
+                //////////////
                 DetailsEmloyeeViewModel detailsEmloyee = new DetailsEmloyeeViewModel();
                 detailsEmloyee.SetEmployee(employee);
                 return View(detailsEmloyee);
             }
         }
+
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Delete(int? id, string? redirectUrl)
         {
             if (id == null)

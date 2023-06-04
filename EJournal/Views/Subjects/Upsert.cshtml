@@ -9,8 +9,11 @@
 }
 
 <h1>@ViewData["Title"]</h1>
+<div>
+    <a asp-action="Index" class="btn btn-primary our-link">Вернуться к списку</a>
+</div>
 
-<h4>Class</h4>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -26,18 +29,18 @@
                     <span class="text-danger">Данный предмет уже существует</span>
                 } 
             </div>
-
+            <p></p>
 
             <div class="form-group">
 
                 @if (Model.Id == 0)
                 {
-                    <input type="submit" value="Создать" class="btn btn-primary" />
+                    <input type="submit" value="Создать" class="btn btn-primary our-link" />
                 }
                 else
                 {
 
-                    <input type="submit" value="Обновить" class="btn btn-primary" />
+                    <input type="submit" value="Обновить" class="btn btn-primary our-link" />
                 }
 
             </div>
@@ -45,9 +48,6 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Вернуться к списку</a>
-</div>
 
 @section Scripts {
     @{

@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using static EJournal.Models.PersonalData;
 using System.ComponentModel;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace EJournal.Models.ViewModels.EmployeeViewModels
 {
@@ -9,22 +11,37 @@ namespace EJournal.Models.ViewModels.EmployeeViewModels
     {
         public int Id { get; set; } = 0;
         [DisplayName("ФИО")]
+        [StringLength(100, ErrorMessage = "Максимальное значение символов - 100")]
+        [Required(ErrorMessage = "Укажите ФИО сотрудника")]
         public string FullName { get; set; }
         [DisplayName("Дата рождения")]
+        [Required(ErrorMessage = "Укажите дату рождения")]
         public DateTime DateBirth { get; set; } = DateTime.Now;
         [DisplayName("Пол")]
+        [Required(ErrorMessage = "Выберите пол")]
         public Gender gender { get; set; } = Gender.Men;
-        public string? PassId { get; set; }
+        [DisplayName("Серия и номер пасспорта")]
+        [Required(ErrorMessage = "Укажите серию и номер пасспорта пасспорт")]
+        [RegularExpression(@"[0-9]{10}", ErrorMessage = "Введите cерию и номер без пробела (использовать для этого только цифры)")]
+        public string PassId { get; set; }
         [DisplayName("СНИЛС")]
+        [Required(ErrorMessage = "Укажите значение СНИЛС")]
+        [RegularExpression(@"[0-9]{11}", ErrorMessage = "Введите СНИЛС без пробелов и тире")]
         public string SNILS { get; set; }
         [DisplayName("Описание")]
+        [Range(0, 100, ErrorMessage = "Максимальное значение символов - 100")]
         public string? Description { get; set; }
         [DisplayName("Электронная почта")]
+        [EmailAddress(ErrorMessage = "Неверный формат написания электронной почты")]
+        [Required(ErrorMessage = "Укажите электронную почту")]
         public string EMail { get; set; }
         [DisplayName("Номер телефона")]
-        public string? PhoneNumber { get; set; }
+        [Phone(ErrorMessage = "Неверный формат номера")]
+        [Required(ErrorMessage = "Укажите номер мобильного телефона")]
+        public string PhoneNumber { get; set; }
         public bool isActivate { get; set; } = false;
         [DisplayName("Полномочия")]
+        [Required(ErrorMessage = "Укажите хотя бы одну роль для сотрдника")]
         public List<int> RoleIds { get; set; }
         public MultiSelectList RoleMultpleSelectList { get; set; }
         public UpSertEmployeeViewModel() { }
@@ -54,7 +71,7 @@ namespace EJournal.Models.ViewModels.EmployeeViewModels
             Id = employee.Id;
             Description = employee.Description;
             PhoneNumber = employee.Account.PhoneNumber;
-            EMail = employee.Account.EMail;
+            EMail = employee.Account.EMail.ToLower();
             SNILS = employee.Account.PersonalData.SNILS;
             FullName = employee.Account.PersonalData.FullName;
             PassId = employee.Account.PersonalData.PassId;
@@ -68,9 +85,8 @@ namespace EJournal.Models.ViewModels.EmployeeViewModels
         public void GetCopy(Employee employee, IEnumerable<Role> selectedRoles)
         {
             employee.Description = Description;
-            employee.Account.isActivate = isActivate;
             employee.Account.PhoneNumber = PhoneNumber;
-            employee.Account.EMail = EMail;
+            employee.Account.EMail = EMail.ToLower();
             employee.Account.PersonalData.FullName = FullName;
             employee.Account.PersonalData.PassId = PassId;
             employee.Account.PersonalData.SNILS = SNILS;

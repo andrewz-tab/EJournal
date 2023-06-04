@@ -9,7 +9,9 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-
+<div>
+    <a asp-action="Index" class="btn btn-primary our-link">Вернуться к списку</a>
+</div>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -32,6 +34,7 @@
                 </select>
                 <span asp-validation-for="SubjectKey" class="text-danger"></span>
             </div>
+            <p></p>
             <div class="form-group">
                 <label asp-for="EmployeeKey" class="control-label"></label>
                 <select asp-for="EmployeeKey" class="form-control" asp-items="Model.EmployeeDropDown">
@@ -42,6 +45,7 @@
                 </select>
                 <span asp-validation-for="EmployeeKey" class="text-danger"></span>
             </div>
+            <p></p>
             @if(Model.Id == 0)
             {
                 <div class="form-group">
@@ -54,6 +58,7 @@
                     </select>
                     <span asp-validation-for="ClassesIds" class="text-danger"></span>
                 </div>
+                <p></p>
             }
             else
             {
@@ -67,6 +72,7 @@
                     </select>
                     <span asp-validation-for="ClassKey" class="text-danger"></span>
                 </div>
+                <p></p>
             }
 
 
@@ -74,12 +80,12 @@
 
                 @if (Model.Id == 0)
                 {
-                    <input type="submit" value="Создать" class="btn btn-primary" />
+                    <input type="submit" value="Создать" class="btn btn-primary our-link" />
                 }
                 else
                 {
 
-                    <input type="submit" value="Обновить" class="btn btn-primary" />
+                    <input type="submit" value="Обновить" class="btn btn-primary our-link" />
                 }
 
             </div>
@@ -87,9 +93,7 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Вернуться к списку</a>
-</div>
+
 
 @section Scripts {
     @{

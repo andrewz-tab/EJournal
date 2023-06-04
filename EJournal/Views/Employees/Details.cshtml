@@ -1,4 +1,7 @@
-﻿@model EJournal.Models.ViewModels.EmployeeViewModels.DetailsEmloyeeViewModel
+﻿@using Microsoft.AspNetCore.Http
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+@model EJournal.Models.ViewModels.EmployeeViewModels.DetailsEmloyeeViewModel
 
 @{
     ViewData["Title"] = "Данные о сотруднике";
@@ -12,124 +15,160 @@
     }
 }
 
-<h1>@ViewData["Title"]</h1>
+@if (HttpContextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+{
+    var user = HttpContextAccessor.HttpContext.User;
 
-<h4>Class</h4>
-<div>
-    <a asp-action="Index">Вернуться к списку</a> <a asp-action="Upsert" asp-route-id="@Model.Id">Обновить даныне</a>
-</div>
-<hr />
 
-<div class="row">
-    <div class="col-md-4">
-        
-        <input asp-for="Id" hidden />
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.FullName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.FullName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DateBirth)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DateBirth)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.gender)
-        </dt>
-        <dd class="col-sm-10">
-            @ViewData["gender"] <br />
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PassId)
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.PassId == null)
-            {
-                <span>Данные отсутсвуют</span>                
-            }
-            @Html.DisplayFor(model => model.PassId)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.SNILS)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.SNILS)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EMail)
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.EMail == null)
-            {
-                <span>Данные отсутсвуют</span>
-            }
-            @Html.DisplayFor(model => model.EMail)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.PhoneNumber == null)
-            {
-                <span>Данные отсутсвуют</span>
-            }
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.Description == null)
-            {
-                <span>Данные отсутсвуют</span>
-            }
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.roles)
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.roles == null)
-            {
-                <span>Данных нет</span>
-            }
-            @foreach (var role in Model.roles)
-            {
-                <span>@role.Name</span>
-                <br />
-            }
-        </dd>
-        
+    <h1>@ViewData["Title"]</h1>
+
+    <div>
+        @if (user.FindFirst(WC.TypeUser)?.Value == WC.EmployeeUser)
+        {
+            <a asp-action="Index" class="btn btn-primary our-link">Открыть полный список сотрудников</a>
+        }
+        @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+        {
+            <a asp-action="Upsert" asp-route-id="@Model.Id" class="btn btn-primary our-link">Обновить даныне</a>
+        }
     </div>
-</div>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-4">
+
+            <input asp-for="Id" hidden />
+
+            @if (!Model.isActivate && user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+            {
+                <a asp-controller="Login" asp-action="ActivateAccount" asp-route-accountId="@Model.accountId" class="btn btn-primary our-link">Активировать аккаунт</a>
+            }
+            <dt>
+                @Html.DisplayNameFor(model => model.FullName)
+            </dt>
+            <dd >
+                @Html.DisplayFor(model => model.FullName)
+            </dd>
+            <dt >
+                @Html.DisplayNameFor(model => model.EMail)
+            </dt>
+            <dd>
+                @if (Model.EMail == null)
+                {
+                    <span>Данные отсутсвуют</span>
+                }
+                @Html.DisplayFor(model => model.EMail)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd>
+                @if (Model.Description == null)
+                {
+                    <span>Данные отсутсвуют</span>
+                }
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.roles)
+            </dt>
+            <dd>
+                @if (Model.roles == null)
+                {
+                    <span>Данных нет</span>
+                }
+                @foreach (var role in Model.roles)
+                {
+                    <span>@role.Name</span>
+                    <br />
+                }
+            </dd>
 
 
-    <hr />
-<h4>Классы</h4>
-<a asp-controller="Classes" asp-action="Upsert">Добавить класс</a>
-@if (Model.classes.Count() != 0)
-{
-    await Html.RenderPartialAsync("EmployeesClass", Model.classes);
-}
-else
-{
-    <dt class="col-sm-2">
-        Классы отсутсвуют
-    </dt>
-}
-    <hr />
-    <h4>Дисциплины</h4>
-<a asp-controller="Classes" asp-action="Upsert">Добавить дисциплину</a>
-@if (Model.disciplines.Count() != 0)
-{
-    await Html.RenderPartialAsync("EmployeesDiscipline", Model.disciplines);
-}
-else
-{
-    <dt class="col-sm-2">
-        Дисциплины отсутсвуют
-    </dt>
+            @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+            {
+                <dt>
+                    @Html.DisplayNameFor(model => model.DateBirth)
+                </dt>
+                <dd>
+                    @(Model.DateBirth.ToString("dd.MM.yyyy"))
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.gender)
+                </dt>
+                <dd>
+                    @ViewData["gender"] <br />
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.PassId)
+                </dt>
+                <dd>
+                    @if (Model.PassId == null)
+                    {
+                        <span>Данные отсутсвуют</span>
+                    }
+                    @Html.DisplayFor(model => model.PassId)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.SNILS)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.SNILS)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                </dt>
+                <dd>
+                    @if (Model.PhoneNumber == null)
+                    {
+                        <span>Данные отсутсвуют</span>
+                    }
+                    @Html.DisplayFor(model => model.PhoneNumber)
+                </dd>
+            }
+        </div>
+    </div>
+
+    @if (Model.roles.Any(r => r.Name == WC.TeacherRole || r.Name == WC.HeadTeacherRole))
+    {
+        <a asp-controller="Timetable" asp-action="ByTeacher" asp-route-teacherId="@Model.Id" class="btn btn-primary our-link">Расписание преподавателя</a>
+        <hr />
+        <h4>Классы</h4>
+        @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+        {
+            <a asp-controller="Classes" asp-action="Upsert" class="btn btn-primary our-link">Добавить класс</a>
+        }
+        @if (Model.classes.Count() != 0)
+        {
+            <p></p>
+            await Html.RenderPartialAsync("EmployeesClass", Model.classes);
+        }
+        else
+        {
+            <dt>
+                Классы отсутсвуют
+            </dt>
+        }
+        <hr />
+        <h4>Дисциплины</h4>
+        
+        @if (user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+        {
+            <a asp-controller="Disciplines" asp-action="Upsert" class="btn btn-primary our-link">Добавить дисциплину</a>
+        }
+        @if (Model.disciplines.Count() != 0)
+        {
+            <p></p>
+            await Html.RenderPartialAsync("EmployeesDiscipline", Model.disciplines);
+        }
+        else
+        {
+            <dt>
+                Дисциплины отсутсвуют
+            </dt>
+        }
+
+    }
+
 }

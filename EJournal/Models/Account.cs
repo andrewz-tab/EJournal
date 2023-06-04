@@ -16,5 +16,10 @@ namespace EJournal.Models
         public Employee? Employee { get; set; }
         public Student? Student { get; set; }
 
+        public bool isRequiredChangePassword { get; set; } = true;
+        public string? Login { get; set; }
+        public string? Password { get; set; }
+        public bool isChanged { get; set; } = false;
+
     }
 }

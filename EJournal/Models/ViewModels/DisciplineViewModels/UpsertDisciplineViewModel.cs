@@ -9,15 +9,19 @@ namespace EJournal.Models.ViewModels.DisciplineViewModels
     {
         public int Id { get; set; } = 0;
         [DisplayName("Учитель")]
+        [Required(ErrorMessage = "Выберите учителя")]
         public int EmployeeKey { get; set; }
         public IEnumerable<SelectListItem> EmployeeDropDown { get; set; }
         [DisplayName("Класс")]
+        [Required(ErrorMessage = "Выберите класс")]
         public int ClassKey { get; set; }
         public IEnumerable<SelectListItem> ClassDropDown { get; set; }
         [DisplayName("Предмет")]
+        [Required(ErrorMessage = "Выберите предмет")]
         public int SubjectKey { get; set; }
         public IEnumerable<SelectListItem> SubjectDropDown { get; set; }
         [DisplayName("Классы")]
+        [Required(ErrorMessage = "Выберите хотя бы один класс")]
         public List<int> ClassesIds { get; set; }
         public MultiSelectList ClassMultpleSelectList { get; set; }
 

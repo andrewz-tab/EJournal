@@ -3,10 +3,12 @@ using EJournal.Models;
 using EJournal.Models.ViewModels.ClassViewModels;
 using EJournal.Models.ViewModels.EmployeeViewModels;
 using EJournal.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace EJournal.Controllers
 {
@@ -17,7 +19,8 @@ namespace EJournal.Controllers
         {
             this._dbContext = dbContext;
         }
-        public async Task<IActionResult> Index()
+		[Authorize(Policy = WC.PolicyOnlyForEmployee)]
+		public async Task<IActionResult> Index()
         {
             IEnumerable<Class> classes = await this._dbContext.GetAllAsync(
                 include: c =>
@@ -29,6 +32,7 @@ namespace EJournal.Controllers
         }
 
 
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(int? id)
         {
             UpSertClassViewModel CurrentClass = new UpSertClassViewModel
@@ -54,6 +58,7 @@ namespace EJournal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(UpSertClassViewModel inputClass)
         {
             bool isValid = true;
@@ -90,7 +95,7 @@ namespace EJournal.Controllers
 
         }
 
-
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -103,13 +108,22 @@ namespace EJournal.Controllers
                 if (classDetails == null)
                 {
                     return NotFound();
-                }         
+                }
+                ///////////////
+                var user = User;
+                var roles = user.FindAll(ClaimTypes.Role);
+                if (user.FindFirstValue(WC.TypeUser) == WC.StudentUser && !(user.FindFirstValue(WC.ClassId) == classDetails.Id.ToString()))
+                {
+                    return NotFound();
+                }
+                //////////////
                 DetailsClassViewModel detailsClass = new DetailsClassViewModel();
                 detailsClass.SetClass(classDetails);
                 return View(detailsClass);
             }
         }
 
+        [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Delete(int? id, string? redirectUrl)
         {
             if (id == null)

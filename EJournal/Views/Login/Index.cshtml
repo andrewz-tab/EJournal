@@ -1,0 +1,45 @@
+﻿@model EJournal.Models.ViewModels.LoginViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Вход в личный кабинет ЭЖ";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+    @if(ViewData["Error"] != null)
+    {
+    <p class="text-danger">
+    @ViewData["Error"] </p>
+    }
+
+    @if (ViewData["Good"] != null)
+    {
+    <p class="text-success">
+        @ViewData["Good"]
+    </p>
+    }
+<hr />
+
+
+<div class="col-4 align-content-center">
+    <form method="post" asp-action="Index">
+        <div class="form-group">
+            <label asp-for="Login" class="control-label move inputrow"></label>
+            <input asp-for="Login" class="form-control" />
+            <span asp-validation-for="Login" class="text-danger field-validation-valid"></span>
+        
+        <div class="form-group">
+            <label asp-for="Password" class="control-label move"></label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger field-validation-valid"></span>
+            </div>
+        <p></p>
+        <input type="submit" value="Войти" class="btn btn-primary our-link" />
+    </form>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

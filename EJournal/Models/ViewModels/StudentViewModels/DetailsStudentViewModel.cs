@@ -8,6 +8,8 @@ namespace EJournal.Models.ViewModels.StudentViewModels
     {
 
         public int Id { get; set; } = 0;
+        public int? EmployeeClassManagerId { get; set; }
+        public int accountId { get; set; }
         [DisplayName("ФИО")]
         public string FullName { get; set; }
         [DisplayName("Дата рождения")]
@@ -16,6 +18,7 @@ namespace EJournal.Models.ViewModels.StudentViewModels
         public Gender gender { get; set; } = Gender.Men;
         public string? PassId { get; set; }
         [DisplayName("СНИЛС")]
+        
         public string SNILS { get; set; }
         [DisplayName("Описание")]
         public string? Description { get; set; }
@@ -31,6 +34,8 @@ namespace EJournal.Models.ViewModels.StudentViewModels
 
         public void SetStudent(Student student)
         {
+            EmployeeClassManagerId = student.Class.EmployeeKey;
+            accountId = student.AccountKey;
             Id = student.Id;
             Description = student.Description;
             PhoneNumber = student.Account.PhoneNumber;

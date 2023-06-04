@@ -1,55 +1,86 @@
-﻿@model IEnumerable<EJournal.Models.Discipline>
+﻿@using Microsoft.AspNetCore.Http
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<EJournal.Models.Discipline>
 
 @{
 	ViewData["Title"] = "Список действующих дисциплин";
 }
 
 <h1>@ViewData["Title"]</h1>
+@if (HttpContextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+{
+    var user = HttpContextAccessor.HttpContext.User;
 
-<p>
-    <a asp-action="Upsert">Добавить дисциплину</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Subject.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Employee.Account.PersonalData.FullName)
-            </th>
-            <th>
-                Класс
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    @if (user.HasClaim(claim => (claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole))))
+    {
+        <p>
+            <a asp-action="Upsert" class="btn btn-primary our-link">Добавить дисциплину</a>
+        </p>
+    }
+    <table id="table1" class="table table-light table-striped table-hover table-bordered table align-middle">
+        <thead>
             <tr>
-                <td>
-                    <a asp-controller="Subjects" asp-action="Details" asp-route-id="@item.SubjectKey">
-                        @Html.DisplayFor(modelItem => item.Subject.Name)
-                    </a>
-                </td>
-                <td>
-                    <a asp-controller="Employees" asp-action="Details" asp-route-id="@item.EmployeeKey">
-                        @Html.DisplayFor(modelItem => item.Employee.Account.PersonalData.FullName)
-                    </a>
-                </td>
-                <td>
-                    <a asp-controller="Classes" asp-action="Details" asp-route-id="@item.ClassKey">
-                        @Html.DisplayFor(modelItem => item.Class.Number)
-                        @Html.DisplayFor(modelItem => item.Class.Liter)
-                    </a>
-                </td>
-                <td>
-                    <a asp-action="Upsert" asp-route-id="@item.Id">Изменить</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Подробнее</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Subject.Name)
+                </th>
+                @if (user.HasClaim(claim => (claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole))))
+                {
+                    <th>
+                        @Html.DisplayNameFor(model => model.Employee.Account.PersonalData.FullName)
+                </th>
+                }
+                <th>
+                    Класс
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                if ((user.HasClaim(claim => claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole)))
+                || ((user.HasClaim(claim => claim.Type == ClaimTypes.Role && claim.Value == WC.TeacherRole)) && (user.HasClaim(claim => claim.Type == WC.EmployeeId && claim.Value == item.EmployeeKey.ToString()))))
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Subject.Name)
+                        </td>
+                        @if (user.HasClaim(claim => (claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole))))
+                        {
+                            <td>
+                                <a asp-controller="Employees" asp-action="Details" asp-route-id="@item.EmployeeKey" class="nav-link">
+                                    @Html.DisplayFor(modelItem => item.Employee.Account.PersonalData.FullName)
+                                </a>
+                            </td>
+                        }
+                        @if (user.HasClaim(claim => (claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole))))
+                        {
+                            <td>
+                                <a asp-controller="Classes" asp-action="Details" asp-route-id="@item.ClassKey" class="nav-link">
+                                    @Html.DisplayFor(modelItem => item.Class.Number)
+                                    @Html.DisplayFor(modelItem => item.Class.Liter)
+                                </a>
+                            </td>
+                        } else
+                        {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Class.Number)
+                                @Html.DisplayFor(modelItem => item.Class.Liter)
+                            </td>
+                        }
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="nav-link custom-btn btn-7">Подробнее</a>
+                            @if (user.HasClaim(claim => (claim.Type == ClaimTypes.Role && (claim.Value == WC.AdminRole || claim.Value == WC.HeadTeacherRole))))
+                            {
+                                <text> | </text>
+                                <a asp-action="Upsert" asp-route-id="@item.Id" class="nav-link custom-btn btn-3">Изменить</a> <text> | </text>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="nav-link custom-btn btn-5">Удалить</a>
+                            }
+                    </td>
+                </tr>
+                }
+            }
+        </tbody>
+    </table>
+}

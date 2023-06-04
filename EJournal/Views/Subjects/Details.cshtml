@@ -7,7 +7,7 @@
 
 <h4>Предмет @Model.Name</h4>
 <div>
-    <a asp-action="Index">Вернуться к списку</a> <a asp-action="Upsert" asp-route-id="@Model.Id">Обновить даныне</a>
+    <a asp-action="Index" class="btn btn-primary our-link">Вернуться к списку</a> <a asp-action="Upsert" asp-route-id="@Model.Id" class="btn btn-primary our-link">Обновить даныне</a>
 </div>
 <hr />
 
@@ -16,11 +16,13 @@
 
         <input asp-for="Id" hidden />
 
-        <hr />
         <h4>Дисциплины</h4>
-        <a asp-controller="Disciplines" asp-action="Upsert">Добавить дисциплину</a>
+        <a asp-controller="Disciplines" asp-action="Upsert" class="btn btn-primary our-link">Добавить дисциплину</a>
+
+    </div>
         @if (Model.Disciplines.Count() != 0)
         {
+            <p></p>
             await Html.RenderPartialAsync("SubjectsDiscipline", Model.Disciplines);
         }
         else
@@ -32,6 +34,5 @@
 
 
 
-    </div>
 </div>
 

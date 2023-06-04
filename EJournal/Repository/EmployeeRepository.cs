@@ -1,6 +1,8 @@
 ﻿using EJournal.Data;
 using EJournal.Models;
 using EJournal.Repository.IRepository;
+using EJournal.Service.Implementations;
+using EJournal.Service.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Operations;
@@ -15,9 +17,11 @@ namespace EJournal.Repository
     public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     {
         private readonly JournalDbContext _dbContext;
-        public EmployeeRepository(JournalDbContext dbContext) : base(dbContext)
+        private readonly IDumpService _dumpService;
+        public EmployeeRepository(JournalDbContext dbContext, IDumpService dumpService) : base(dbContext)
         {
             this._dbContext = dbContext;
+            _dumpService = dumpService;
         }
 
         new public async Task<Employee> FirstOrDefaultAsync(
@@ -67,6 +71,14 @@ namespace EJournal.Repository
                 await _dbContext.Entry(employee).Reference(e => e.Account).LoadAsync();
                 await _dbContext.Entry(employee.Account).Reference(a => a.PersonalData).LoadAsync();
                 await _dbContext.Entry(employee).Collection(e => e.Roles).LoadAsync();
+            }
+            if(!employee.Roles.Any(r => r.Name == WC.TeacherRole || r.Name == WC.HeadTeacherRole))
+            {
+                await _dbContext.Entry(employee).Collection(e => e.Disciplines).LoadAsync();
+                await _dbContext.Entry(employee).Collection(e => e.Classes).LoadAsync();
+                await _dumpService.CreateDump();
+                employee.Disciplines.Clear();
+                employee.Classes.Clear();
             }
 
             _dbContext.Employees.Update(employee);

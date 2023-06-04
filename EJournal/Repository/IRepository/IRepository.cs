@@ -27,6 +27,7 @@ namespace EJournal.Repository.IRepository
         Task SaveAsync();
         void Remove(T entity);
 
+        public IEnumerable<SelectListItem> GetAllEmployeesList();
         public IEnumerable<SelectListItem> GetAllTeachersList();
         public IEnumerable<SelectListItem> GetAllClassesList();
         public IEnumerable<SelectListItem> GetAllSubjectsList();

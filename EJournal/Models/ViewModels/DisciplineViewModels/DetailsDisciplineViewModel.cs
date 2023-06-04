@@ -3,6 +3,7 @@ using NuGet.Packaging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
 
 namespace EJournal.Models.ViewModels.DisciplineViewModels
@@ -10,6 +11,9 @@ namespace EJournal.Models.ViewModels.DisciplineViewModels
     public class DetailsDisciplineViewModel
     {
         public int Id { get; set; } = 0;
+        public int classId { get; set; }
+        public int EmployeeId { get; set; }
+        public int? EmployeeClassManagerId { get; set; }
         [DisplayName("Учитель")]
         public string EmployeeName { get; set; }
         [DisplayName("Класс")]
@@ -21,6 +25,9 @@ namespace EJournal.Models.ViewModels.DisciplineViewModels
         public Dictionary<SelectListItem, List<int>> studentMarks { get; set; }
         public void SetDiscipline(Discipline discipline)
         {
+            EmployeeClassManagerId = discipline.Class.EmployeeKey;
+            classId = discipline.ClassKey;
+            EmployeeId = discipline.EmployeeKey;
             Id = discipline.Id;
             EmployeeName = discipline.Employee.Account.PersonalData.FullName;
             ClassName = discipline.Class.Number.ToString() + discipline.Class.Liter;

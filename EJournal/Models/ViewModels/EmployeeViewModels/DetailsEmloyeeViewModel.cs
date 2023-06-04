@@ -7,6 +7,7 @@ namespace EJournal.Models.ViewModels.EmployeeViewModels
     public class DetailsEmloyeeViewModel
     {
         public int Id { get; set; } = 0;
+        public int accountId { get; set; }
         [DisplayName("ФИО")]
         public string FullName { get; set; }
         [DisplayName("Дата рождения")]
@@ -29,6 +30,7 @@ namespace EJournal.Models.ViewModels.EmployeeViewModels
         public IEnumerable<Discipline> disciplines { get; set; }
         public void SetEmployee(Employee employee)
         {
+            accountId = employee.AccountKey;
             Id = employee.Id;
             Description = employee.Description;
             PhoneNumber = employee.Account.PhoneNumber;

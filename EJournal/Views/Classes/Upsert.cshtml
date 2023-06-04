@@ -9,8 +9,9 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-
-<h4>Class</h4>
+<div>
+    <a asp-action="Index" class="btn btn-primary our-link">Вернуться к списку</a>
+</div>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -26,34 +27,34 @@
             <div class="form-group">
                 <label asp-for="Number" class="control-label"></label>
                 <input asp-for="Number" class="form-control" />
-                <span asp-validation-for="Number" class="text-danger"></span>
+                <span asp-validation-for="Number" class="text-danger field-validation-valid"></span>
             </div>
-            
-            
+            <p></p>
             <div class="form-group">
                 <label asp-for="Liter" class="control-label"></label>
                 <input asp-for="Liter" class="form-control" />
-                <span asp-validation-for="Liter" class="text-danger"></span>
+                <span asp-validation-for="Liter" class="text-danger field-validation-valid"></span>
             </div>
+            <p></p>
             <div class="form-group">
                 <label asp-for="EmployeeKey" class="control-label">Сотрудник</label>
                 <select asp-for="EmployeeKey" class="form-control" asp-items="Model.EmployeeDropDown">
                     <option disabled selected>--Выберите преподавателя--</option>
                 </select>
-                <span asp-validation-for="EmployeeKey" class="text-danger"></span>
+                <span asp-validation-for="EmployeeKey" class="text-danger field-validation-valid"></span>
             </div>
-
+            <p></p>
 
             <div class="form-group">
 
                 @if (Model.Id == 0)
                 {
-                    <input type="submit" value="Создать" class="btn btn-primary" />
+                    <input type="submit" value="Создать" class="btn btn-primary our-link" />
                 }
                 else
                 {
 
-                    <input type="submit" value="Обновить" class="btn btn-primary" />
+                    <input type="submit" value="Обновить" class="btn btn-primary our-link" />
                 }
 
             </div>
@@ -61,9 +62,7 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Вернуться к списку</a>
-</div>
+
 
 @section Scripts {
     @{
