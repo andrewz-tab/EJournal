@@ -1,0 +1,61 @@
+﻿@using Microsoft.AspNetCore.Http
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<string>
+
+@{
+	ViewData["Title"] = "Список резервных копирований";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<a asp-controller="Backups" asp-action="Create" class="btn btn-primary our-link">Создать резервную копию</a>
+<hr />
+
+
+@if (ViewData["Error"] != null)
+{
+	<p class="text-danger">
+		@ViewData["Error"]
+	</p>
+}
+else if (ViewData["Good"] != null)
+{
+	<p class="text-success">
+		@ViewData["Good"]
+	</p>
+}
+
+@if (Model?.Count() == 0)
+{
+	<text>Резервные копии отсутствуют</text>
+}
+else
+{
+	<div class="row">
+		<table id="table1" class="table-bordered tablecolor">
+			<thead>
+				<tr>
+					<th>
+						Резервная копиия
+					</th>
+					<th>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				@foreach (var copy in Model)
+				{
+					<tr>
+						<td>@copy</td>
+						<td>
+							<a asp-controller="Backups" asp-action="Jump" asp-route-nameDump="@copy" class="nav-link custom-btn btn-3">Применить</a>
+							<a asp-controller="Backups" asp-action="Delete" asp-route-nameDump="@copy" class="nav-link custom-btn btn-5">Удалить</a>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}

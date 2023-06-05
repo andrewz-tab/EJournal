@@ -1,0 +1,29 @@
+﻿@model EJournal.Models.ViewModels.BackupViewModels.BackupViewModel
+
+@{
+	ViewData["Title"] = "Востановление";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<a asp-controller="Backups" asp-action="Index" class="btn btn-primary our-link">Вернуться к списку резервных копий</a>
+<hr />
+
+@if (!Model.isError)
+{
+	<p class="text-success">
+		@Model.statusMessage
+	</p>
+}
+else if (ViewData["Error"] != null)
+{
+	<p class="text-danger">
+		@Model.statusMessage
+	</p>
+}
+else
+{
+	<p class="text-danger">
+		Успешное востановление из резерного копирования
+	</p>
+}
