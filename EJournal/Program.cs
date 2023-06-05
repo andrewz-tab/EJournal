@@ -95,10 +95,10 @@ namespace EJournal
                 app.UseHsts();
             }
 
+
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
-
             app.UseRouting();
             app.UseAuthentication();
 			app.UseAuthorization();
@@ -119,6 +119,12 @@ namespace EJournal
             app.MapControllerRoute(
                 name: "login",
                 pattern: "{controller=Login}/{action=ChangePassword}/");
+            app.MapControllerRoute(
+                name: "login",
+                pattern: "{controller=Login}/{action=Index}/");
+            /*
+             * Остальные пути сайта
+             */
             app.Run();
         }
     }

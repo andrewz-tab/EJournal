@@ -59,7 +59,6 @@ namespace EJournal.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-
         [Authorize(Policy = WC.PolicyOnlyForHeadTeacherOrAdmin)]
         public async Task<IActionResult> Upsert(UpsertStudentViewModel inputAccountStudent)
         {

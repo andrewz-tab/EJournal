@@ -17,43 +17,35 @@ namespace EJournal.Utility
 		public async Task InvokeAsync(HttpContext context, IAccountService _accountService, EndpointDataSource endpointDataSource)
 		{
             var user = context.User;
-			if (user == null)
-			{
+			if (user == null){
 				await next.Invoke(context);
 			}
-			else if (user.Identity?.IsAuthenticated ?? false)
-			{
+			else if (user.Identity?.IsAuthenticated ?? false){
 				var response = await _accountService.CheckChanged(new ClaimsIdentity(user.Claims));
-				if (response.StatusCode == StatusCodeEnum.OK)
-				{
-					if (response.Data)
-					{
+				if (response.StatusCode == StatusCodeEnum.OK){
+					if (response.Data){
 						var responseUpdate = await _accountService.Update(new ClaimsIdentity(user.Claims));
-						if (responseUpdate.StatusCode == StatusCodeEnum.OK)
-						{
+						if (responseUpdate.StatusCode == StatusCodeEnum.OK){ 
 							await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 							var claimsPrincipal = new ClaimsPrincipal(responseUpdate.Data);
 							await context.SignInAsync(claimsPrincipal);
 						}
-						else
-						{
+						else{
 							await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 						}
 					}
-					if (user.HasClaim(claim => claim.Type == WC.RequiredChangePassword) && context.Request.Path != "/Login/ChangePassword" && context.Request.Path != "/Login/Logout")
-					{
+					if (user.HasClaim(claim => claim.Type == WC.RequiredChangePassword) && context.Request.Path != "/Login/ChangePassword" 
+						&& context.Request.Path != "/Login/Logout"){
 						context.Response.Redirect("/Login/ChangePassword");
                     }
 					await next.Invoke(context);
 				}
-				else
-				{
+				else{
 					await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 					await next.Invoke(context);
 				}
 			}
-			else
-			{
+			else{
 				await next.Invoke(context);
 			}
 		}

@@ -27,7 +27,7 @@ namespace EJournal.Models.ViewModels.StudentViewModels
         [RegularExpression(@"[0-9]{11}", ErrorMessage = "Введите СНИЛС без пробелов и тире")]
         public string SNILS { get; set; }
         [DisplayName("Описание")]
-        [Range(0, 100, ErrorMessage = "Максимальное значение символов - 100")]
+        [MaxLength (100, ErrorMessage = "Максимальное значение символов - 100")]
         public string? Description { get; set; }
         //[Remote(action: "CheckEmail", controller: "Home", ErrorMessage = "Email уже используется")]
         [DisplayName("Электронная почта")]

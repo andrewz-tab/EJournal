@@ -119,8 +119,8 @@ namespace EJournal.Controllers
             return View(inputAccountEmployee);
         }
 
-        [Authorize]
-        public async Task<IActionResult> Details(int? id)
+        [Authorize] //Доступ имеет только авторизованные пользователи
+        public async Task<IActionResult> Details(int? id) 
         {
             if(id == null)
             {
@@ -128,22 +128,22 @@ namespace EJournal.Controllers
             }
             else
             {
-                Employee employee = await _dbContext.FirstOrDefaultAsync(isDetail: true, e => e.Id == id);
+                Employee employee = await _dbContext.FirstOrDefaultAsync(isDetail: true, e => e.Id == id); //поиск сотрудника с заданным Id
                 if(employee == null)
                 {
                     return NotFound();
                 }
                 ///////////////
                 var user = User;
-                var roles = user.FindAll(ClaimTypes.Role);
+                var roles = user.FindAll(ClaimTypes.Role); // проверка прав пользователя
                 if (user.FindFirstValue(WC.TypeUser) == WC.StudentUser && employee.Roles.Count() == 1 && employee.Roles.First().Name == WC.AdminRole)
                 {
                     return NotFound();
                 }
                 //////////////
                 DetailsEmloyeeViewModel detailsEmloyee = new DetailsEmloyeeViewModel();
-                detailsEmloyee.SetEmployee(employee);
-                return View(detailsEmloyee);
+                detailsEmloyee.SetEmployee(employee); 
+                return View(detailsEmloyee); //передача модели представлению
             }
         }
 

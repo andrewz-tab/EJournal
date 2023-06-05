@@ -106,7 +106,7 @@ namespace EJournal.Controllers
             return View(inputDiscipline);
         }
 
-        [Authorize(Policy = WC.PolicyOnlyForEmployee)]
+        [Authorize(Policy = WC.PolicyOnlyForEmployee)] //данная страница будет доступна тольк для сотрудников
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -115,23 +115,24 @@ namespace EJournal.Controllers
             }
             else
             {
-                Discipline discipline = await _dbContext.FirstOrDefaultAsync(isDetail: true, d => d.Id == id);
+                Discipline discipline = await _dbContext.FirstOrDefaultAsync(isDetail: true, d => d.Id == id); //поиск дисциплин
                 if (discipline == null)
                 {
                     return NotFound();
                 }
                 var user = User;
                 var roles = user.FindAll(ClaimTypes.Role);
-                if (roles.Count() == 1 && roles.FirstOrDefault()?.Value == WC.TeacherRole)
+                if (roles.Count() == 1 && roles.FirstOrDefault()?.Value == WC.TeacherRole) //проверка прав пользователя
                 {
-                    if(!(user.FindFirstValue(WC.EmployeeId) == discipline.EmployeeKey.ToString() || user.FindFirstValue(WC.EmployeeId) == discipline.Class.EmployeeKey.ToString()))
+                    if(!(user.FindFirstValue(WC.EmployeeId) == discipline.EmployeeKey.ToString() 
+                        || user.FindFirstValue(WC.EmployeeId) == discipline.Class.EmployeeKey.ToString()))
                     {
                         return NotFound();
                     }
                 }
                 DetailsDisciplineViewModel detailsDiscipline = new DetailsDisciplineViewModel();
                 detailsDiscipline.SetDiscipline(discipline);
-                return View(detailsDiscipline);
+                return View(detailsDiscipline); //передача модели в представление
             }
         }
 
