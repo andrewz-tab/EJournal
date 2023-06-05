@@ -95,7 +95,7 @@
                                         )
                                 </td >
                                 <td class="tablefirsttdd">@Model.timetable[Model.dateBegin.AddDays(j + 3)].FirstOrDefault(l => l.Index == i)?.Discipline.Subject.Name</td>
-                                <td>@Model.timetable[Model.dateBegin.AddDays(j)].FirstOrDefault(l => l.Index == i)?.Discipline.Class.Name</td>
+                                <td>@Model.timetable[Model.dateBegin.AddDays(j + 3)].FirstOrDefault(l => l.Index == i)?.Discipline.Class.Name</td>
                                 <td class="tablehomeworktdd">@Model.timetable[Model.dateBegin.AddDays(j + 3)].FirstOrDefault(l => l.Index == i)?.HomeWork</td>
 
 

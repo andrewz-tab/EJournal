@@ -10,7 +10,7 @@ namespace EJournal.Models.ViewModels.StudentViewModels
     {
         public int Id { get; set; } = 0;
         [DisplayName("ФИО")]
-        [Required(ErrorMessage = "Укажите ФИО сотрудника")]
+        [Required(ErrorMessage = "Укажите ФИО ученика")]
         [StringLength(100, ErrorMessage = "Максимальное значение символов - 100")]
         public string FullName { get; set; }
         [DisplayName("Дата рождения")]
@@ -20,6 +20,7 @@ namespace EJournal.Models.ViewModels.StudentViewModels
         [Required(ErrorMessage = "Выберите пол")]
         public Gender gender { get; set; } = Gender.Men;
         //[Remote(action: "CheckEmail", controller: "Home", ErrorMessage = "Email уже используется")]
+        [DisplayName("Серия и номер паспорта")]
         public string? PassId { get; set; }
         //[Remote(action: "CheckEmail", controller: "Home", ErrorMessage = "Email уже используется")]
         [DisplayName("СНИЛС")]
@@ -83,7 +84,6 @@ namespace EJournal.Models.ViewModels.StudentViewModels
         public void GetCopy(Student student)
         {
             student.Description = Description;
-            student.Account.isActivate = isActivate;
             student.Account.PhoneNumber = PhoneNumber;
             student.Account.EMail = EMail.ToLower();
             student.Account.PersonalData.FullName = FullName;

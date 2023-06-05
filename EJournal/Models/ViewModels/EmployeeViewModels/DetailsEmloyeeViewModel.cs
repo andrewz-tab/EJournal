@@ -14,6 +14,7 @@ namespace EJournal.Models.ViewModels.EmployeeViewModels
         public DateTime DateBirth { get; set; } = DateTime.Now;
         [DisplayName("Пол")]
         public Gender gender { get; set; } = Gender.Men;
+        [DisplayName("Серия и номер паспорта")]
         public string? PassId { get; set; }
         [DisplayName("СНИЛС")]
         public string SNILS { get; set; }

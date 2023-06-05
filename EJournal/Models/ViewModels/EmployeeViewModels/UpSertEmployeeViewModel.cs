@@ -20,7 +20,7 @@ namespace EJournal.Models.ViewModels.EmployeeViewModels
         [DisplayName("Пол")]
         [Required(ErrorMessage = "Выберите пол")]
         public Gender gender { get; set; } = Gender.Men;
-        [DisplayName("Серия и номер пасспорта")]
+        [DisplayName("Серия и номер паспорта")]
         [Required(ErrorMessage = "Укажите серию и номер пасспорта пасспорт")]
         [RegularExpression(@"[0-9]{10}", ErrorMessage = "Введите cерию и номер без пробела (использовать для этого только цифры)")]
         public string PassId { get; set; }

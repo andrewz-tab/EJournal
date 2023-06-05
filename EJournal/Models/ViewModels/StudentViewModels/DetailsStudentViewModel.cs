@@ -16,6 +16,7 @@ namespace EJournal.Models.ViewModels.StudentViewModels
         public DateTime DateBirth { get; set; } = DateTime.Now;
         [DisplayName("Пол")]
         public Gender gender { get; set; } = Gender.Men;
+        [DisplayName("Серия и номер паспорта")]
         public string? PassId { get; set; }
         [DisplayName("СНИЛС")]
         
